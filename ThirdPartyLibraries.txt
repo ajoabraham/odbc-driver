@@ -8,5 +8,5 @@
 3.ZLIB
 	http://blog.sina.com.cn/s/blog_6e0693f70100sjgj.html
 	compile with MT
-	add /safeseh to bld_ml.bat
+	add /safeseh to bld_ml32.bat ==> ml /coff /safeseh /Zi /c /Flmatch686.lst match686.asm
 	tested with v1.2.8

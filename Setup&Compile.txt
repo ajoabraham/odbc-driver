@@ -1,0 +1,2 @@
+1. Install Microsoft Visual Studio 2013 + MDAC
+2. Install InstallShield for Visual Studio
