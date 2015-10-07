@@ -165,7 +165,7 @@
       <SubSystem>Console</SubSystem>
       <OutputFile>$(Platform)\$(Configuration)\driver.dll</OutputFile>
       <ImportLibrary>$(Platform)\$(Configuration)\driver.lib</ImportLibrary>
-      <AdditionalDependencies>odbccp32.lib;odbc32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;cpprest110_2_0.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbccp32.lib;odbc32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;cpprest120_2_0.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\driver.DEF</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
@@ -260,7 +260,7 @@
       <SubSystem>Console</SubSystem>
       <OutputFile>$(Platform)\$(Configuration)\driver.dll</OutputFile>
       <ImportLibrary>$(Platform)\$(Configuration)\driver.lib</ImportLibrary>
-      <AdditionalDependencies>cpprest110d_2_0.lib;odbc32.lib;odbccp32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cpprest120d_2_0.lib;odbc32.lib;odbccp32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\driver.DEF</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>

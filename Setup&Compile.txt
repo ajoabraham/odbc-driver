@@ -2,4 +2,6 @@
 2. Install InstallShield for Visual Studio: https://msdn.microsoft.com/en-us/library/dn531020(v=vs.120).aspx
 3. go to zlib-1.2.8/contrib/vstudio/vc11/zlibvc.sln for solution file for building, project is zlibstat for static linking library
 4. go to cpprest-2.0.0/Binaries for built result
-5. 
+5. setup ZLIB_HOME and CPPREST_HOME environment variables for system
+6. Install Visual Leak Detector for Visual C++ v2.4rc2 https://vld.codeplex.com/releases
+7. 
