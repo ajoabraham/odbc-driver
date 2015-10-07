@@ -10,3 +10,7 @@
 	compile with MT
 	add /safeseh to bld_ml32.bat ==> ml /coff /safeseh /Zi /c /Flmatch686.lst match686.asm
 	tested with v1.2.8
+
+4. Installation Shield
+	https://msdn.microsoft.com/en-us/library/dn531020(v=vs.120).aspx
+	
