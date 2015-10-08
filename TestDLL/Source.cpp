@@ -9,6 +9,8 @@ int main() {
 
     //regression test:
     //simpleQueryTest();
-    queryFlowTest();
+    //queryFlowTest();
     //crossValidate();
+
+	veroRestApiTest();
 }

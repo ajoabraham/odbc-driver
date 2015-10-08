@@ -19,13 +19,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-
 using namespace utility;
 using namespace web::http;
 using namespace web::http::client;
 using namespace concurrency::streams;
 using namespace web;
 using namespace web::json;
+
 
 void printLog ( const char* msg ) {
     time_t     now = time ( 0 );
