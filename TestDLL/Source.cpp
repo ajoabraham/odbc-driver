@@ -4,10 +4,11 @@ using namespace std;
 
 
 int main() {
-    //unit test
+    //unit test:
     //restAPITest();
+
     //regression test:
     //simpleQueryTest();
-    //queryFlowTest();
-    crossValidate();
+    queryFlowTest();
+    //crossValidate();
 }

@@ -10,6 +10,7 @@
 #include "Gzip.h"
 #include "QueryCache.h"
 #include "JsonConverter.h"
+#include "VeroCommon.h"
 
 #include <ctime>
 #include <fcntl.h>
@@ -166,7 +167,7 @@ bool restAuthenticate ( char* serverAddr, long port, char* username, char* passw
     config.set_timeout ( utility::seconds ( 300 ) );
     http_client session ( serverAddrW, config );
     //can get project list only when correct username/password is given
-    http_request request = makeRequest ( username, passwd, L"/kylin/api/projects", methods::GET );
+    http_request request = makeRequest ( username, passwd, REST_URI_PROJECTS, methods::GET );
     http_response response = session.request ( request ).get();
     
     if ( response.status_code() == status_codes::OK )
@@ -181,7 +182,7 @@ void restListProjects ( char* serverAddr, long port, char* username, char* passw
     http_client_config config;
     config.set_timeout ( utility::seconds ( 300 ) );
     http_client session ( serverAddrW, config );
-    http_request request = makeRequest ( username, passwd, L"/kylin/api/projects", methods::GET );
+	http_request request = makeRequest(username, passwd, REST_URI_PROJECTS, methods::GET);
     http_response response = session.request ( request ).get();
     
     if ( response.status_code() == status_codes::OK ) {
@@ -213,7 +214,7 @@ std::unique_ptr<MetadataResponse> restGetMeta ( char* serverAddr, long port , ch
     config.set_timeout ( utility::seconds ( 300 ) );
     http_client session ( serverAddrW, config );
     std::wstringstream wss;
-    wss << L"/kylin/api/tables_and_columns" << L"?project=" << project;
+    wss << REST_URI_TABLES_AND_COLUMNS << L"?project=" << project;
     http_request request = makeRequest ( username, passwd, wss.str().c_str(), methods::GET );
     http_response response = session.request ( request ).get();
     
@@ -313,7 +314,7 @@ std::unique_ptr<SQLResponse> restQuery ( wchar_t* rawSql, char* serverAddr, long
     http_client_config config;
     config.set_timeout ( utility::seconds ( 36000 ) );
     http_client session ( serverAddrW, config );
-    http_request request = makeRequest ( username, passwd, L"/kylin/api/query", methods::POST );
+    http_request request = makeRequest ( username, passwd, REST_URI_QUERY, methods::POST );
     wstring sql = cookQuery ( rawSql );
     std::wstringstream wss;
     wss << L"{ \"acceptPartial\": false, \"project\" : \"" << project << L"\", " <<  " \"sql\" : \"" << sql << L"\" }"  ;

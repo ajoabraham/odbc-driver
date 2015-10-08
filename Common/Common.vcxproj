@@ -188,6 +188,7 @@
     <ClInclude Include="QueryCache.h" />
     <ClInclude Include="REST.h" />
     <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="VeroCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Base64.cpp" />

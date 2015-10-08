@@ -1,8 +1,6 @@
 #pragma once
 
 
-
-
 enum JDBCTypes {
     /**
         <P>The constant in the Java programming language, sometimes referred
