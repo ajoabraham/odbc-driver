@@ -18,6 +18,7 @@
     <ClCompile Include="RestAPITest.cpp" />
     <ClCompile Include="SimpleQueryTest.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="VeroTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColorPrint.h" />

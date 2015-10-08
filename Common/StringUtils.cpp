@@ -65,6 +65,18 @@ void copyTrimmed ( char** dest, char* src ) {
     trimwhitespace ( *dest );
 }
 
+void makeSlug(char *str) {
+	if (str == NULL || strlen(str) == 0) {
+		return;
+	}
+
+	for (unsigned int i = 0; i < strlen(str); i++) {
+		if (isspace(str[i])) {
+			str[i] = '_';
+		}
+	}
+}
+
 std::unique_ptr<wchar_t[]> char2wchar ( char* orig ) {
     if ( orig == NULL )
     { return NULL; }

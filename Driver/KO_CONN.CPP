@@ -122,7 +122,10 @@ eGoodBad SetConnProp ( pODBCConn pConn, Word pPropID, void* pPropValue ) {
         
             // check if a new value has to be put
             if ( pPropValue )
-            { copyTrimmed ( & ( ( char* ) pConn->Project ), ( char* ) pPropValue ); }
+            { 
+				copyTrimmed(&((char*)pConn->Project), (char *)pPropValue);
+				makeSlug(pConn->Project);
+			}
             
             if ( pConn->Project == NULL || strlen ( pConn->Project ) == 0 ) {
                 __ODBCPopMsg ( "Project cannot be empty" );
@@ -738,7 +741,7 @@ RETCODE SQL_API SQLDriverConnect ( SQLHDBC         pConn,
     Word    iKVInputPairs;             // no of key value pairs as input
     Word    iDriverPos, iDSNPos;                    // ??? can be eliminated by optimization of code
     Word    iServerPos, iPortPos, iUIDPos, iPWDPos, iProjPos;     // ??? can be eliminated by optimization of code
-    struct ODBCKV* KVInput;                    // key value as input via  function param
+    struct ODBCKV* KVInput;                    // key value as input via function param
     struct ODBCKV* KV;                         // generic, temp
     
     if ( !pInConnStr ) {

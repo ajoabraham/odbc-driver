@@ -21,6 +21,7 @@
 #include <sqlext.h>                                     // required for ODBC calls
 #include <iostream>
 #include <REST.h>
+#include <StringUtils.h>
 
 void report();
 void report ( const char* msg );
@@ -29,4 +30,7 @@ void simpleQueryTest();
 void queryFlowTest();
 void restAPITest();
 void crossValidate();
+
 void veroRestApiTest();
+void veroMakeSlugTest();
+

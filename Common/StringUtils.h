@@ -18,6 +18,7 @@ std::string wstring2string ( std::wstring& orig );
 
 void trimwhitespace ( char* str );
 void copyTrimmed ( char** dest, char* src );
+void makeSlug(char *str);
 
 std::unique_ptr<char[]> str_base64_encode ( char* raw );
 std::unique_ptr<char[]> str_base64_decode ( char* enc );

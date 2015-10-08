@@ -240,6 +240,8 @@ static eGoodBad testGetMetadata ( char* serverStr, char* uidStr, char* pwdStr, l
     strcpy ( ( ( pODBCConn ) conn )->UserName, uidStr );
     strcpy ( ( ( pODBCConn ) conn )->Password, pwdStr );
     strcpy ( ( ( pODBCConn ) conn )->Project, project );
+	makeSlug(((pODBCConn)conn)->Project);
+
     ( ( pODBCConn ) conn )->ServerPort = port;
     RETCODE ret = TryFetchMetadata ( conn );
     _SQLFreeDiag ( _DIAGCONN ( conn ) );
