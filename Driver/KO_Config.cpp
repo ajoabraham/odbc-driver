@@ -22,6 +22,8 @@
 
 static char currentDSN[BUFFERSIZE];
 
+static std::map<string, string> projectMap;
+
 static int GetValueFromODBCINI ( char* section, char* key, char* defaultValue, char* buffer, int bufferSize,
                                  char* initFileName ) {
     return SQLGetPrivateProfileString ( section, key, defaultValue, buffer, bufferSize, initFileName );
@@ -234,13 +236,12 @@ static pODBCConn createConn() {
     return conn;
 }
 
-static eGoodBad testGetMetadata ( char* serverStr, char* uidStr, char* pwdStr, long port, char* project ) {
+static eGoodBad testGetMetadata ( char* serverStr, char* uidStr, char* pwdStr, long port, const char* project ) {
     pODBCConn    conn = createConn();
     strcpy ( ( ( pODBCConn ) conn )->Server, serverStr );
     strcpy ( ( ( pODBCConn ) conn )->UserName, uidStr );
     strcpy ( ( ( pODBCConn ) conn )->Password, pwdStr );
     strcpy ( ( ( pODBCConn ) conn )->Project, project );
-	makeSlug(((pODBCConn)conn)->Project);
 
     ( ( pODBCConn ) conn )->ServerPort = port;
     RETCODE ret = TryFetchMetadata ( conn );
@@ -572,12 +573,12 @@ INT_PTR CALLBACK DlgDSNCfg2Proc ( HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lP
                                 EnableWindow ( hwndCombo, TRUE );
                                 
                                 try {
-                                    std::vector<string> projects;
-                                    restListProjects ( serverStr, port, uidStr, pwdStr, projects );
+									projectMap.clear();
+									restListProjects(serverStr, port, uidStr, pwdStr, projectMap);
                                     
-                                    for ( unsigned int i = 0 ; i < projects.size(); ++i ) {
-                                        SendMessage ( hwndCombo, ( UINT ) CB_ADDSTRING, ( WPARAM ) 0, ( LPARAM ) projects.at ( i ).c_str() );
-                                    }
+									for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
+										SendMessage(hwndCombo, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(*i).first.c_str());
+									}
                                     
                                     SendMessage ( hwndCombo, CB_SETCURSEL, ( WPARAM ) 0, ( LPARAM ) 0 );
                                 }
@@ -614,7 +615,16 @@ INT_PTR CALLBACK DlgDSNCfg2Proc ( HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lP
                                                 ( WPARAM ) ItemIndex, ( LPARAM ) projectName );
                                                 
                         if ( RetriveDlgData ( hDlg, newDSN, serverStr, uidStr, pwdStr, &port ) == GOOD ) {
-                            if ( testGetMetadata ( serverStr, uidStr, pwdStr, port, projectName ) == GOOD ) {
+							auto find = projectMap.find(std::string(projectName));
+							std::string projectSlug;
+
+							if (find != projectMap.end()) {
+								projectSlug = projectMap.at(std::string(projectName));
+							} else {
+								projectSlug = projectName;
+							}
+
+							if (testGetMetadata(serverStr, uidStr, pwdStr, port, projectSlug.c_str()) == GOOD) {
                                 SaveConfigToODBCINI ( newDSN, serverStr, uidStr, pwdStr, port, projectName );
                                 EndDialog ( hDlg, wParam );
                                 return TRUE;

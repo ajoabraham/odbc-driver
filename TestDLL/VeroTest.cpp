@@ -1,13 +1,13 @@
+#include <map>
 #include "Tests.h"
 
 
 void veroRestApiTest() {
-	std::vector<string> holder;
-	restListProjects(KServerAddr, KPort, KUserName, KPassword, holder);
+	std::map<string, string> projectMap;
+	restListProjects(KServerAddr, KPort, KUserName, KPassword, projectMap);
 
-	for (unsigned int i = 0; i < holder.size(); i++) {
-		std::string projectName = holder.at(i);
-		cout << "Project = " << projectName;
+	for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
+		cout << "Project = " << (*i).first << endl;
 	}
 }
 

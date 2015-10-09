@@ -22,7 +22,7 @@
 using namespace std;
 
 
-class  TableMeta {
+class TableMeta {
   public:
     string TABLE_CAT;
     string TABLE_SCHEM;
@@ -34,7 +34,6 @@ class  TableMeta {
     string TYPE_NAME;
     string SELF_REFERENCING_COL_NAME;
     string REF_GENERATION;
-    
 };
 
 class ColumnMeta {
@@ -62,7 +61,6 @@ class ColumnMeta {
     string SCOPE_TABLE;
     short SOURCE_DATA_TYPE;
     string IS_AUTOINCREMENT;
-    
 };
 
 class MetadataResponse {
@@ -81,7 +79,6 @@ class MetadataResponse {
             delete p;
         }
     }
-    
 };
 
 class SelectedColumnMeta {
@@ -105,13 +102,11 @@ class SelectedColumnMeta {
     bool isReadOnly;
     bool isWritable ;
     bool isDefinitelyWritable ;
-    
 };
 
 class SQLRowContent {
   public:
     std::vector<wstring> contents;
-    
 };
 
 class SQLResponse {
@@ -401,10 +396,7 @@ class SQLResponse {
         sqlResp->columnMetas.push_back ( m18 );
         sqlResp->columnMetas.push_back ( m19 );
     }
-    
 };
-
-
 
 class ErrorMessage {
   public:
@@ -412,5 +404,4 @@ class ErrorMessage {
     
     // if isException, the detailed exception message
     wstring  msg;
-    
 };

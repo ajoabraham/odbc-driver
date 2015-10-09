@@ -538,6 +538,8 @@ RETCODE SQL_API _SQLDisconnect ( pODBCConn pHandle ) {
         pHandle->Stmts = NULL;
     }
     
+	pHandle->projectMap.clear();
+
     //free meta
     if ( pHandle->meta ) {
         pHandle->meta = NULL;

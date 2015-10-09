@@ -1,3 +1,4 @@
+#include <map>
 #include "Tests.h"
 
 
@@ -10,10 +11,10 @@ void restAPITest() {
     }
 
     {
-        std::vector<string> holder;
-        restListProjects ( KServerAddr, KPort, KUserName, KPassword, holder );
+        std::map<string, string> projectMap;
+		restListProjects(KServerAddr, KPort, KUserName, KPassword, projectMap);
         
-        if ( holder.size() == 0 )
+		if (projectMap.size() == 0)
         { report(); }
     }
 

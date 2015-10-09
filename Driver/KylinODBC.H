@@ -54,6 +54,7 @@
 #include <windows.h>
 #include <sqlext.h>
 #include <odbcinst.h>
+#include <map>
 
 // -------------------- legacy types for basic data types ---------------------
 #include "MsgTypes.h"
@@ -445,6 +446,7 @@ struct ODBCConn {
     struct ODBCConn*     Next;                                           // next connection
     struct ODBCConn*     Prev;                                           // prev connection
     
+	std::map<string, string> projectMap;
     std::unique_ptr<MetadataResponse> meta;                                 // ACTUAL metadata returned from REST Server
 };
 

@@ -122,9 +122,8 @@ eGoodBad SetConnProp ( pODBCConn pConn, Word pPropID, void* pPropValue ) {
         
             // check if a new value has to be put
             if ( pPropValue )
-            { 
+            {
 				copyTrimmed(&((char*)pConn->Project), (char *)pPropValue);
-				makeSlug(pConn->Project);
 			}
             
             if ( pConn->Project == NULL || strlen ( pConn->Project ) == 0 ) {
@@ -167,7 +166,7 @@ static eGoodBad CreateAndSetConnProp ( pODBCConn pConn, Word pPropID, void* pPro
     
     // check property type
     if ( IsPropStr ) {
-        Word    x;
+        Word x;
         unique_ptr<char[]> s = NULL;
         // find length of property
         x = pPropValue ? strlen ( ( StrPtr ) pPropValue ) : 0;
@@ -185,7 +184,7 @@ static eGoodBad CreateAndSetConnProp ( pODBCConn pConn, Word pPropID, void* pPro
     }
     
     else {
-        Long    v;
+        Long v;
         // convert value to integer
         v = ( pPropValue ) ? atoi ( ( StrPtr ) pPropValue ) : 0;
         // now set the property
@@ -376,12 +375,11 @@ INT_PTR CALLBACK DlgDSNCfg1Proc ( HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lP
                         EnableWindow ( hwndCombo, TRUE );
                         
                         try {
-                            std::vector<string> projects;
-                            restListProjects ( pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, projects );
+							restListProjects(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, pgConn->projectMap);
                             
-                            for ( unsigned int i = 0 ; i < projects.size(); ++i ) {
-                                SendMessage ( hwndCombo, ( UINT ) CB_ADDSTRING, ( WPARAM ) 0, ( LPARAM ) projects.at ( i ).c_str() );
-                            }
+							for (std::map<string, string>::iterator i = pgConn->projectMap.begin(); i != pgConn->projectMap.end(); i++) {
+								SendMessage(hwndCombo, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(*i).first.c_str());
+							}
                             
                             SendMessage ( hwndCombo, CB_SETCURSEL, ( WPARAM ) 0, ( LPARAM ) 0 );
                         }
@@ -550,7 +548,7 @@ eGoodBad CvtStrToKeyValues ( CStrPtr pStr, Word pMaxLen, Word* pNumPair, struct 
     }
 }
 
-void        FreeGenODBCKeyValues ( ODBCKV* keyvalues, int pairs ) {
+void FreeGenODBCKeyValues ( ODBCKV* keyvalues, int pairs ) {
     for ( int i = 0 ; i < pairs; ++i ) {
         if ( keyvalues[i].key )
         { delete[] keyvalues[i].key ; }
@@ -924,8 +922,7 @@ RETCODE   TryFetchMetadata ( pODBCConn pgConn ) {
     __ODBCLOG ( _ODBCLogMsg ( LogLevel_DEBUG, "start loading metadata..." ) );
     
     try {
-        pgConn->meta = std::move ( restGetMeta ( pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password,
-                                                 pgConn->Project ) );
+		pgConn->meta = std::move(restGetMeta(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, pgConn->Project));
     }
     
     catch ( const exception& e ) {
@@ -959,6 +956,25 @@ RETCODE   TryAuthenticate ( pODBCConn pgConn ) {
     __ODBCLOG ( _ODBCLogMsg ( LogLevel_DEBUG, "End authenticating" ) );
     return SQL_SUCCESS;
 }
+
+RETCODE TryFetchProjects(pODBCConn pgConn) {
+	__ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "Start fetching projects.."));
+
+	try {
+		restListProjects(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, pgConn->projectMap);
+	}
+
+	catch (const exception& e) {
+		__ODBCLOG(_ODBCLogMsg(LogLevel_ERROR, "The REST request failed to fetch projects."));
+		__ODBCLOG(_ODBCLogMsg(LogLevel_ERROR, e.what()));
+		_SQLPutDiagRow(SQL_HANDLE_DBC, pgConn, "SQLDriverConnect", "HY000", 1045, "Access denied. (using password: NO)");
+		return SQL_ERROR;
+	}
+
+	__ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "End fetching projects"));
+	return SQL_SUCCESS;
+}
+
 
 // -----------------------------------------------------------------------
 // to connect to the server using standard parameters

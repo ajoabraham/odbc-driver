@@ -106,8 +106,7 @@ RETCODE SQL_API _SQLExecStmtFromReq ( pODBCStmt pStmt, bool pPrepared ) {
     std::unique_ptr<SQLResponse> p;
     
     try {
-        p = restQuery ( pStmt->Stmt, pStmt->Conn->Server, pStmt->Conn->ServerPort, pStmt->Conn->UserName, pStmt->Conn->Password,
-                        pStmt->Conn->Project );
+		p = restQuery(pStmt->Stmt, pStmt->Conn->Server, pStmt->Conn->ServerPort, pStmt->Conn->UserName, pStmt->Conn->Password, pStmt->Conn->Project);
         __ODBCLOG ( _ODBCLogMsg ( LogLevel_DEBUG, "The REST request succeed" ) );
     }
     
