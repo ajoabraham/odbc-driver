@@ -13,5 +13,5 @@ int main() {
     //crossValidate();
 
 	//veroRestApiTest();
-	veroMakeSlugTest();
+	veroMakeUriTest();
 }

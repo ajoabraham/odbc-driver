@@ -207,14 +207,23 @@ void restListProjects ( char* serverAddr, long port, char* username, char* passw
     }
 }
 
+std::wstringstream makeMetaUri(char* project) {
+	std::wstringstream uri;
+#if defined(_KYLIN_REST_SERVICE)
+	uri << REST_URI_TABLES_AND_COLUMNS << L"?project=" << project;
+#else
+	uri << REST_URI_PROJECTS << L"/" << project << L"/" << L"schema";
+#endif
+	return uri;
+}
+
 std::unique_ptr<MetadataResponse> restGetMeta ( char* serverAddr, long port , char* username, char* passwd,
                                                 char* project ) {
     wstring  serverAddrW = completeServerStr ( serverAddr,  port ) ;
     http_client_config config;
     config.set_timeout ( utility::seconds ( 300 ) );
     http_client session ( serverAddrW, config );
-    std::wstringstream wss;
-    wss << REST_URI_TABLES_AND_COLUMNS << L"?project=" << project;
+    std::wstringstream wss = makeMetaUri(project);
     http_request request = makeRequest ( username, passwd, wss.str().c_str(), methods::GET );
     http_response response = session.request ( request ).get();
     
@@ -300,6 +309,16 @@ wstring getBodyString ( http_response& response ) {
     return ret;
 }
 
+std::wstringstream makeQueryUri(char* project) {
+	std::wstringstream uri;
+#if defined(_KYLIN_REST_SERVICE)
+	uri << REST_URI_QUERY << L"?project=" << project;
+#else
+	uri << REST_URI_PROJECTS << L"/" << project << L"/" << L"query";
+#endif
+	return uri;
+}
+
 std::unique_ptr<SQLResponse> restQuery ( wchar_t* rawSql, char* serverAddr, long port, char* username,
                                          char* passwd,
                                          char* project ) {
@@ -314,11 +333,12 @@ std::unique_ptr<SQLResponse> restQuery ( wchar_t* rawSql, char* serverAddr, long
     http_client_config config;
     config.set_timeout ( utility::seconds ( 36000 ) );
     http_client session ( serverAddrW, config );
-    http_request request = makeRequest ( username, passwd, REST_URI_QUERY, methods::POST );
+	std::wstringstream wss1 = makeQueryUri(project);
+	http_request request = makeRequest(username, passwd, wss1.str().c_str(), methods::POST);
     wstring sql = cookQuery ( rawSql );
-    std::wstringstream wss;
-    wss << L"{ \"acceptPartial\": false, \"project\" : \"" << project << L"\", " <<  " \"sql\" : \"" << sql << L"\" }"  ;
-    request.set_body ( wss.str(), L"application/json" );
+    std::wstringstream wss2;
+    wss2 << L"{ \"acceptPartial\": false, \"project\" : \"" << project << L"\", " <<  " \"sql\" : \"" << sql << L"\" }"  ;
+    request.set_body ( wss2.str(), L"application/json" );
     request.headers().add ( header_names::accept_encoding, "gzip,deflate" );
     http::status_code status;
     http_response response;

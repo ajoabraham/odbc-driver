@@ -32,5 +32,5 @@ void restAPITest();
 void crossValidate();
 
 void veroRestApiTest();
-void veroMakeSlugTest();
+void veroMakeUriTest();
 

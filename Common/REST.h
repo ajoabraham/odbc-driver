@@ -12,3 +12,7 @@ std::unique_ptr<SQLResponse> restQuery ( wchar_t* rawSql, char* serverAddr, long
                                          char* project );
 std::unique_ptr<MetadataResponse> restGetMeta ( char* serverAddr, long port, char* username, char* passwd,
                                                 char* project );
+
+//TEST
+std::wstringstream makeMetaUri(char* project);
+std::wstringstream makeQueryUri(char* project);
