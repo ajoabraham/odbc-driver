@@ -24,16 +24,21 @@ using namespace std;
 
 class TableMeta {
   public:
+	// ODBC defined fields
+	// https://msdn.microsoft.com/zh-tw/library/ms711831(v=vs.85).aspx
     string TABLE_CAT;
     string TABLE_SCHEM;
     string TABLE_NAME;
     string TABLE_TYPE;
     string REMARKS;
+#if defined(_KYLIN_REST_SERVICE)
+	// the following fields are not used
     string TYPE_CAT;
     string TYPE_SCHEM;
     string TYPE_NAME;
     string SELF_REFERENCING_COL_NAME;
     string REF_GENERATION;
+#endif
 };
 
 class ColumnMeta {

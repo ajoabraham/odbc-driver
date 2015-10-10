@@ -6,6 +6,7 @@
 
 TableMeta* TableMetaFromJSON(web::json::value & object) {
 	TableMeta* result = new TableMeta();
+#if defined(_KYLIN_REST_SERVICE)
 	x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, object[U("table_CAT")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, object[U("table_SCHEM")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, object[U("table_NAME")], as_string());
@@ -16,6 +17,13 @@ TableMeta* TableMetaFromJSON(web::json::value & object) {
 	x_ASSIGN_IF_NOT_NULL(result->TYPE_NAME, object[U("type_NAME")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->SELF_REFERENCING_COL_NAME, object[U("self_REFERENCING_COL_NAME")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->REF_GENERATION, object[U("ref_GENERATION")], as_string());
+#else
+	x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, object[U("catalogName")], as_string()); // vero doesn't have this
+	x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, object[U("schemaName")], as_string());
+	x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, object[U("name")], as_string());
+	x_ASSIGN_IF_NOT_NULL(result->TABLE_TYPE, object[U("tableType")], as_string());
+	x_ASSIGN_IF_NOT_NULL(result->REMARKS, object[U("description")], as_string());
+#endif
 	return result;
 }
 
@@ -77,6 +85,7 @@ std::unique_ptr<MetadataResponse> MetadataResponseFromJSON(web::json::value & ob
 
 	return result;
 }
+
 SelectedColumnMeta* SelectedColumnMetaFromJSON(web::json::value & object) {
 	SelectedColumnMeta* result = new SelectedColumnMeta();
 	ASSIGN_IF_NOT_NULL(result->isAutoIncrement, object[U("autoIncrement")], as_bool());
