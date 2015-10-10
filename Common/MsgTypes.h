@@ -23,16 +23,16 @@ using namespace std;
 
 
 class TableMeta {
-  public:
-	// ODBC defined fields
-	// https://msdn.microsoft.com/zh-tw/library/ms711831(v=vs.85).aspx
+public:
+    // ODBC defined fields
+    // https://msdn.microsoft.com/zh-tw/library/ms711831(v=vs.85).aspx
     string TABLE_CAT;
     string TABLE_SCHEM;
     string TABLE_NAME;
     string TABLE_TYPE;
     string REMARKS;
 #if defined(_KYLIN_REST_SERVICE)
-	// the following fields are not used
+    // the following fields are not used
     string TYPE_CAT;
     string TYPE_SCHEM;
     string TYPE_NAME;
@@ -42,7 +42,7 @@ class TableMeta {
 };
 
 class ColumnMeta {
-  public:
+public:
     string TABLE_CAT;
     string TABLE_SCHEM;
     string TABLE_NAME;
@@ -69,142 +69,146 @@ class ColumnMeta {
 };
 
 class MetadataResponse {
-  public:
+public:
     std::vector<TableMeta*> tableMetas;
     std::vector<ColumnMeta*> columnMetas;
-    
+
     ~MetadataResponse() {
-        for ( std::vector<TableMeta*>::size_type i = 0 ; i < tableMetas.size(); ++i ) {
-            TableMeta* p = tableMetas.at ( i );
+        for (std::vector<TableMeta*>::size_type i = 0; i < tableMetas.size(); ++i) {
+            TableMeta* p = tableMetas.at(i);
             delete p;
         }
-        
-        for ( std::vector<ColumnMeta*>::size_type i = 0 ; i < columnMetas.size(); ++i ) {
-            ColumnMeta* p = columnMetas.at ( i );
+
+        for (std::vector<ColumnMeta*>::size_type i = 0; i < columnMetas.size(); ++i) {
+            ColumnMeta* p = columnMetas.at(i);
             delete p;
         }
     }
 };
 
 class SelectedColumnMeta {
-  public:
+public:
     bool isAutoIncrement;
     bool isCaseSensitive;
     bool isSearchable;
     bool isCurrency;
-    int isNullable ;//0:nonull, 1:nullable, 2: nullableunknown
-    bool isSigned ;
+    int isNullable;//0:nonull, 1:nullable, 2: nullableunknown
+    bool isSigned;
     int displaySize;
     string label;// AS keyword
-    string name ;
-    string schemaName ;
+    string name;
+    string schemaName;
     string catelogName;
     string tableName;
     int precision;
     int scale;
-    int columnType ;// the orig value passed from REST is java.sql.Types, we convert it to SQL Type
-    string columnTypeName ;
+    int columnType;// the orig value passed from REST is java.sql.Types, we convert it to SQL Type
+    string columnTypeName;
     bool isReadOnly;
-    bool isWritable ;
-    bool isDefinitelyWritable ;
+    bool isWritable;
+    bool isDefinitelyWritable;
 };
 
 class SQLRowContent {
-  public:
+public:
     std::vector<wstring> contents;
 };
 
 class SQLResponse {
-  public:
+public:
     // the data type for each column
     std::vector<SelectedColumnMeta*> columnMetas;
-    
+
     // the results rows, each row contains several columns
     std::vector<SQLRowContent*> results;
-    
+
     // if not select query, only return affected row count
     int affectedRowCount;
-    
+
     // flag indicating whether an exception occurred
     bool isException;
-    
+
     // if isException, the detailed exception message
     wstring exceptionMessage;
-    
+
     ~SQLResponse() {
-        for ( std::vector<SelectedColumnMeta*>::size_type i = 0 ; i < columnMetas.size(); ++i ) {
-            SelectedColumnMeta* p = columnMetas.at ( i );
+        for (std::vector<SelectedColumnMeta*>::size_type i = 0; i < columnMetas.size(); ++i) {
+            SelectedColumnMeta* p = columnMetas.at(i);
             delete p;
         }
-        
-        for ( std::vector<SQLRowContent*>::size_type i = 0 ; i < results.size(); ++i ) {
-            SQLRowContent* p = results.at ( i );
+
+        for (std::vector<SQLRowContent*>::size_type i = 0; i < results.size(); ++i) {
+            SQLRowContent* p = results.at(i);
             delete p;
         }
     }
-    
-    static std::unique_ptr<SQLResponse> MakeResp4SQLTables ( MetadataResponse* meta ) {
-        std::unique_ptr<SQLResponse> ret ( new SQLResponse() );
-        FillColumnMetas4SQLTables ( ret.get() );
-        
-        for ( auto i = meta->tableMetas.begin(); i != meta->tableMetas.end(); i++ ) {
+
+    static std::unique_ptr<SQLResponse> MakeResp4SQLTables(MetadataResponse* meta) {
+        std::unique_ptr<SQLResponse> ret(new SQLResponse());
+        FillColumnMetas4SQLTables(ret.get());
+
+        for (auto i = meta->tableMetas.begin(); i != meta->tableMetas.end(); i++) {
             SQLRowContent* temp = new SQLRowContent();
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_CAT ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_SCHEM ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_NAME ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_TYPE ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->REMARKS ) );
-            ret->results.push_back ( temp );
+            temp->contents.push_back(string2wstring((*i)->TABLE_CAT));
+            temp->contents.push_back(string2wstring((*i)->TABLE_SCHEM));
+            temp->contents.push_back(string2wstring((*i)->TABLE_NAME));
+            temp->contents.push_back(string2wstring((*i)->TABLE_TYPE));
+            temp->contents.push_back(string2wstring((*i)->REMARKS));
+            ret->results.push_back(temp);
         }
-        
+
         return ret;
     }
-    
-    static std::unique_ptr<SQLResponse> MakeResp4SQLColumns ( MetadataResponse* meta, char* tableName, char* columnName ) {
-        std::unique_ptr<SQLResponse> ret ( new SQLResponse() );
-        FillColumnMetas4SQLColumns ( ret.get() );
-        
-        for ( auto i = meta->columnMetas.begin(); i != meta->columnMetas.end(); i++ ) {
+
+    static std::unique_ptr<SQLResponse> MakeResp4SQLColumns(MetadataResponse* meta, char* tableName, char* columnName) {
+        std::unique_ptr<SQLResponse> ret(new SQLResponse());
+        FillColumnMetas4SQLColumns(ret.get());
+
+        for (auto i = meta->columnMetas.begin(); i != meta->columnMetas.end(); i++) {
             //filter
-            if ( tableName != NULL && _stricmp ( tableName, ( *i )->TABLE_NAME.c_str() ) != 0 )
-            { continue; }
-            
-            if ( columnName != NULL && _stricmp ( columnName, ( *i )->COLUMN_NAME.c_str() ) != 0 )
-            { continue; }
-            
+            if (tableName != NULL && _stricmp(tableName, (*i)->TABLE_NAME.c_str()) != 0)
+            {
+                continue;
+            }
+
+            if (columnName != NULL && _stricmp(columnName, (*i)->COLUMN_NAME.c_str()) != 0)
+            {
+                continue;
+            }
+
             SQLRowContent* temp = new SQLRowContent();
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_CAT ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_SCHEM ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->TABLE_NAME ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->COLUMN_NAME ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->DATA_TYPE ) ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->TYPE_NAME ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->COLUMN_SIZE ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->BUFFER_LENGTH ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->DECIMAL_DIGITS ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->NUM_PREC_RADIX ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->NULLABLE ) ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->REMARKS ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->COLUMN_DEF ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->SQL_DATA_TYPE ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->SQL_DATETIME_SUB ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->CHAR_OCTET_LENGTH ) ) );
-            temp->contents.push_back ( string2wstring ( std::to_string ( ( *i )->ORDINAL_POSITION ) ) );
-            temp->contents.push_back ( string2wstring ( ( *i )->IS_NULLABLE ) );
-            temp->contents.push_back ( L"0" ); //user_data_type
-            ret->results.push_back ( temp );
+            temp->contents.push_back(string2wstring((*i)->TABLE_CAT));
+            temp->contents.push_back(string2wstring((*i)->TABLE_SCHEM));
+            temp->contents.push_back(string2wstring((*i)->TABLE_NAME));
+            temp->contents.push_back(string2wstring((*i)->COLUMN_NAME));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->DATA_TYPE)));
+            temp->contents.push_back(string2wstring((*i)->TYPE_NAME));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->COLUMN_SIZE)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->BUFFER_LENGTH)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->DECIMAL_DIGITS)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->NUM_PREC_RADIX)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->NULLABLE)));
+            temp->contents.push_back(string2wstring((*i)->REMARKS));
+            temp->contents.push_back(string2wstring((*i)->COLUMN_DEF));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->SQL_DATA_TYPE)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->SQL_DATETIME_SUB)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->CHAR_OCTET_LENGTH)));
+            temp->contents.push_back(string2wstring(std::to_string((*i)->ORDINAL_POSITION)));
+            temp->contents.push_back(string2wstring((*i)->IS_NULLABLE));
+            temp->contents.push_back(L"0"); //user_data_type
+            ret->results.push_back(temp);
         }
-        
+
         return ret;
     }
-    
-    static std::string GetString ( int i ) {
+
+    static std::string GetString(int i) {
         std::ostringstream ss;
         ss << i;
         return ss.str();
     }
-    
-    static void FillColumnMetas4SQLTables ( SQLResponse* sqlResp ) {
+
+    static void FillColumnMetas4SQLTables(SQLResponse* sqlResp) {
         SelectedColumnMeta* m1 = new SelectedColumnMeta();
         m1->label = "TABLE_CAT";
         m1->name = "TABLE_CAT";
@@ -240,14 +244,14 @@ class SQLResponse {
         m5->scale = 0;
         m5->isNullable = 1;
         m5->columnType = ODBCTypes::ODBC_WVarChar;
-        sqlResp->columnMetas.push_back ( m1 );
-        sqlResp->columnMetas.push_back ( m2 );
-        sqlResp->columnMetas.push_back ( m3 );
-        sqlResp->columnMetas.push_back ( m4 );
-        sqlResp->columnMetas.push_back ( m5 );
+        sqlResp->columnMetas.push_back(m1);
+        sqlResp->columnMetas.push_back(m2);
+        sqlResp->columnMetas.push_back(m3);
+        sqlResp->columnMetas.push_back(m4);
+        sqlResp->columnMetas.push_back(m5);
     }
-    
-    static void FillColumnMetas4SQLColumns ( SQLResponse* sqlResp ) {
+
+    static void FillColumnMetas4SQLColumns(SQLResponse* sqlResp) {
         SelectedColumnMeta* m1 = new SelectedColumnMeta();
         m1->label = "TABLE_CAT";
         m1->name = "TABLE_CAT";
@@ -381,32 +385,32 @@ class SQLResponse {
         m19->scale = 0;
         m19->isNullable = 1;
         m19->columnType = ODBCTypes::ODBC_SmallInt;
-        sqlResp->columnMetas.push_back ( m1 );
-        sqlResp->columnMetas.push_back ( m2 );
-        sqlResp->columnMetas.push_back ( m3 );
-        sqlResp->columnMetas.push_back ( m4 );
-        sqlResp->columnMetas.push_back ( m5 );
-        sqlResp->columnMetas.push_back ( m6 );
-        sqlResp->columnMetas.push_back ( m7 );
-        sqlResp->columnMetas.push_back ( m8 );
-        sqlResp->columnMetas.push_back ( m9 );
-        sqlResp->columnMetas.push_back ( m10 );
-        sqlResp->columnMetas.push_back ( m11 );
-        sqlResp->columnMetas.push_back ( m12 );
-        sqlResp->columnMetas.push_back ( m13 );
-        sqlResp->columnMetas.push_back ( m14 );
-        sqlResp->columnMetas.push_back ( m15 );
-        sqlResp->columnMetas.push_back ( m16 );
-        sqlResp->columnMetas.push_back ( m17 );
-        sqlResp->columnMetas.push_back ( m18 );
-        sqlResp->columnMetas.push_back ( m19 );
+        sqlResp->columnMetas.push_back(m1);
+        sqlResp->columnMetas.push_back(m2);
+        sqlResp->columnMetas.push_back(m3);
+        sqlResp->columnMetas.push_back(m4);
+        sqlResp->columnMetas.push_back(m5);
+        sqlResp->columnMetas.push_back(m6);
+        sqlResp->columnMetas.push_back(m7);
+        sqlResp->columnMetas.push_back(m8);
+        sqlResp->columnMetas.push_back(m9);
+        sqlResp->columnMetas.push_back(m10);
+        sqlResp->columnMetas.push_back(m11);
+        sqlResp->columnMetas.push_back(m12);
+        sqlResp->columnMetas.push_back(m13);
+        sqlResp->columnMetas.push_back(m14);
+        sqlResp->columnMetas.push_back(m15);
+        sqlResp->columnMetas.push_back(m16);
+        sqlResp->columnMetas.push_back(m17);
+        sqlResp->columnMetas.push_back(m18);
+        sqlResp->columnMetas.push_back(m19);
     }
 };
 
 class ErrorMessage {
-  public:
+public:
     wstring  url;
-    
+
     // if isException, the detailed exception message
     wstring  msg;
 };
