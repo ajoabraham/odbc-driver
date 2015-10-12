@@ -31,14 +31,13 @@ public:
     string TABLE_NAME;
     string TABLE_TYPE;
     string REMARKS;
-#if defined(_KYLIN_REST_SERVICE)
+
     // the following fields are not used
     string TYPE_CAT;
     string TYPE_SCHEM;
     string TYPE_NAME;
     string SELF_REFERENCING_COL_NAME;
     string REF_GENERATION;
-#endif
 };
 
 class ColumnMeta {
