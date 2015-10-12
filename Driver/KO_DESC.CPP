@@ -103,7 +103,8 @@ eGoodBad            _SQLDetachARDItem(pODBCARD pDesc, pARDItem pDescItem);
 // to get value of specified descriptor field
 // -----------------------------------------------------------------------
 
-RETCODE _SQLGetDescField_basic(SQLHDESC        pDesc,
+RETCODE _SQLGetDescField_basic(
+    SQLHDESC        pDesc,
     SQLSMALLINT     pRecNum,
     SQLSMALLINT     pFldID,
     SQLPOINTER      pDataPtr,
@@ -990,22 +991,21 @@ RETCODE _SQLGetDescField_basic(SQLHDESC        pDesc,
     return SQL_SUCCESS;
 }
 
-
-RETCODE SQL_API SQLGetDescFieldW(SQLHDESC        pDesc,
+RETCODE SQL_API SQLGetDescFieldW(
+    SQLHDESC        pDesc,
     SQLSMALLINT     pRecNum,
     SQLSMALLINT     pFldID,
     SQLPOINTER      pDataPtr,
     SQLINTEGER      pDataSize,
-    SQLINTEGER*     pDataSizePtr)
-
-{
+    SQLINTEGER*     pDataSizePtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG,
         "SQLGetDescFieldW called, Desc: %d, Type: %d, Recnum: %d, Fld: %d, DataPtr: %d, DataSize: %d, DataSizePtr: %d", pDesc,
         (pDesc) ? *((short*)pDesc) : 0, pRecNum, pFldID, pDataPtr, pDataSize, pDataSizePtr));
     return _SQLGetDescField_basic(pDesc, pRecNum, pFldID, pDataPtr, pDataSize, pDataSizePtr, false);
 }
 
-RETCODE SQL_API SQLGetDescField(SQLHDESC        pDesc,
+RETCODE SQL_API SQLGetDescField(
+    SQLHDESC        pDesc,
     SQLSMALLINT     pRecNum,
     SQLSMALLINT     pFldID,
     SQLPOINTER      pDataPtr,
