@@ -27,44 +27,86 @@ TableMeta* TableMetaFromJSON(web::json::value & object) {
 	return result;
 }
 
-ColumnMeta* ColumnMetaFromJSON(web::json::value & object) {
+ColumnMeta* ColumnMetaFromJSON(
+    web::json::value &table_object, 
+    web::json::value &column_object,
+    unsigned int count) {
 	ColumnMeta* result = new ColumnMeta();
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, object[U("table_CAT")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, object[U("table_SCHEM")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, object[U("table_NAME")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->COLUMN_NAME, object[U("column_NAME")], as_string());
-	//ASSIGN_IF_NOT_NULL(result->DATA_TYPE ,object[U("data_TYPE")], as_integer());
-	x_ASSIGN_IF_NOT_NULL(result->TYPE_NAME, object[U("type_NAME")], as_string());
-	ASSIGN_IF_NOT_NULL(result->COLUMN_SIZE, object[U("column_SIZE")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->BUFFER_LENGTH, object[U("buffer_LENGTH")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->DECIMAL_DIGITS, object[U("decimal_DIGITS")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->NUM_PREC_RADIX, object[U("num_PREC_RADIX")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->NULLABLE, object[U("nullable")], as_integer());
-	x_ASSIGN_IF_NOT_NULL(result->REMARKS, object[U("remarks")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->COLUMN_DEF, object[U("column_DEF")], as_string());
-	//ASSIGN_IF_NOT_NULL(result->SQL_DATA_TYPE ,object[U("sql_DATA_TYPE")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->SQL_DATETIME_SUB, object[U("sql_DATETIME_SUB")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->CHAR_OCTET_LENGTH, object[U("char_OCTET_LENGTH")], as_integer());
-	ASSIGN_IF_NOT_NULL(result->ORDINAL_POSITION, object[U("ordinal_POSITION")], as_integer());
-	x_ASSIGN_IF_NOT_NULL(result->IS_NULLABLE, object[U("is_NULLABLE")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->SCOPE_CATLOG, object[U("scope_CATLOG")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->SCOPE_SCHEMA, object[U("scope_SCHEMA")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->SCOPE_TABLE, object[U("scope_TABLE")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->IS_AUTOINCREMENT, object[U("iS_AUTOINCREMENT")], as_string());
+#if defined(_KYLIN_REST_SERVICE)
+    x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, column_object[U("table_CAT")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, column_object[U("table_SCHEM")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, column_object[U("table_NAME")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->COLUMN_NAME, column_object[U("column_NAME")], as_string());
+	//ASSIGN_IF_NOT_NULL(result->DATA_TYPE ,column_object[U("data_TYPE")], as_integer());
+    x_ASSIGN_IF_NOT_NULL(result->TYPE_NAME, column_object[U("type_NAME")], as_string());
+    ASSIGN_IF_NOT_NULL(result->COLUMN_SIZE, column_object[U("column_SIZE")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->BUFFER_LENGTH, column_object[U("buffer_LENGTH")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->DECIMAL_DIGITS, column_object[U("decimal_DIGITS")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->NUM_PREC_RADIX, column_object[U("num_PREC_RADIX")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->NULLABLE, column_object[U("nullable")], as_integer());
+    x_ASSIGN_IF_NOT_NULL(result->REMARKS, column_object[U("remarks")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->COLUMN_DEF, column_object[U("column_DEF")], as_string());
+	//ASSIGN_IF_NOT_NULL(result->SQL_DATA_TYPE ,column_object[U("sql_DATA_TYPE")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->SQL_DATETIME_SUB, column_object[U("sql_DATETIME_SUB")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->CHAR_OCTET_LENGTH, column_object[U("char_OCTET_LENGTH")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->ORDINAL_POSITION, column_object[U("ordinal_POSITION")], as_integer());
+    x_ASSIGN_IF_NOT_NULL(result->IS_NULLABLE, column_object[U("is_NULLABLE")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->SCOPE_CATLOG, column_object[U("scope_CATLOG")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->SCOPE_SCHEMA, column_object[U("scope_SCHEMA")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->SCOPE_TABLE, column_object[U("scope_TABLE")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->IS_AUTOINCREMENT, column_object[U("iS_AUTOINCREMENT")], as_string());
 
-	if (!object[U("source_DATA_TYPE")].is_null()) {
-		result->SOURCE_DATA_TYPE = (short)object[U("source_DATA_TYPE")].as_integer();
+    if (!column_object[U("source_DATA_TYPE")].is_null()) {
+        result->SOURCE_DATA_TYPE = (short)column_object[U("source_DATA_TYPE")].as_integer();
 	}
 
 	// the orig value passed from REST is java.sql.Types, we convert it to SQL Type
 
-	if (!object[U("data_TYPE")].is_null()) {
-		result->DATA_TYPE = JDBC2ODBC(object[U("data_TYPE")].as_integer());
+    if (!column_object[U("data_TYPE")].is_null()) {
+        result->DATA_TYPE = JDBC2ODBC(column_object[U("data_TYPE")].as_integer());
 	}
 
-	if (!object[U("sql_DATA_TYPE")].is_null()) {
-		result->SQL_DATA_TYPE = JDBC2ODBC(object[U("sql_DATA_TYPE")].as_integer());
+    if (!column_object[U("sql_DATA_TYPE")].is_null()) {
+        result->SQL_DATA_TYPE = JDBC2ODBC(column_object[U("sql_DATA_TYPE")].as_integer());
 	}
+#else
+    x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, table_object[U("catalogName")], as_string()); // vero doesn't have this
+    x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, table_object[U("schemaName")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, table_object[U("name")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->COLUMN_NAME, column_object[U("name")], as_string()); // 4
+    ASSIGN_IF_NOT_NULL(result->DATA_TYPE ,column_object[U("data_TYPE")], as_integer()); // TODO: yulinwen, vero doesn't have this
+    x_ASSIGN_IF_NOT_NULL(result->TYPE_NAME, column_object[U("dataType")], as_string()); // 6
+    ASSIGN_IF_NOT_NULL(result->COLUMN_SIZE, column_object[U("dataTypeLength")], as_integer());
+    ASSIGN_IF_NOT_NULL(result->BUFFER_LENGTH, column_object[U("dataTypeLength")], as_integer()); // 8
+    ASSIGN_IF_NOT_NULL(result->DECIMAL_DIGITS, column_object[U("decimal_DIGITS")], as_integer()); // vero doesn't have this
+    ASSIGN_IF_NOT_NULL(result->NUM_PREC_RADIX, column_object[U("num_PREC_RADIX")], as_integer()); // vero doesn't have this
+    ASSIGN_IF_NOT_NULL(result->NULLABLE, column_object[U("nullable")], as_integer());
+    x_ASSIGN_IF_NOT_NULL(result->REMARKS, column_object[U("description")], as_string());
+    x_ASSIGN_IF_NOT_NULL(result->COLUMN_DEF, column_object[U("column_DEF")], as_string()); // 13, vero doesn't have this
+    ASSIGN_IF_NOT_NULL(result->SQL_DATA_TYPE ,column_object[U("sql_DATA_TYPE")], as_integer()); // TODO: yulinwen, vero doesn't have this
+    ASSIGN_IF_NOT_NULL(result->SQL_DATETIME_SUB, column_object[U("sql_DATETIME_SUB")], as_integer()); // vero doesn't have this
+    ASSIGN_IF_NOT_NULL(result->CHAR_OCTET_LENGTH, column_object[U("char_OCTET_LENGTH")], as_integer()); // vero doesn't have this
+    result->ORDINAL_POSITION = count; // 17
+    result->IS_NULLABLE = ""; // vero doesn't have this
+
+    /*
+    x_ASSIGN_IF_NOT_NULL(result->SCOPE_CATLOG, column_object[U("scope_CATLOG")], as_string()); // vero doesn't have this
+    x_ASSIGN_IF_NOT_NULL(result->SCOPE_SCHEMA, column_object[U("scope_SCHEMA")], as_string()); // vero doesn't have this
+    x_ASSIGN_IF_NOT_NULL(result->SCOPE_TABLE, column_object[U("scope_TABLE")], as_string()); // vero doesn't have this
+    x_ASSIGN_IF_NOT_NULL(result->IS_AUTOINCREMENT, column_object[U("iS_AUTOINCREMENT")], as_string()); // vero doesn't have this
+    if (!column_object[U("source_DATA_TYPE")].is_null()) {
+        result->SOURCE_DATA_TYPE = (short)column_object[U("source_DATA_TYPE")].as_integer();
+    }
+    // the orig value passed from REST is java.sql.Types, we convert it to SQL Type
+    if (!column_object[U("data_TYPE")].is_null()) {
+    result->DATA_TYPE = JDBC2ODBC(column_object[U("data_TYPE")].as_integer());
+    }
+
+    if (!column_object[U("sql_DATA_TYPE")].is_null()) {
+    result->SQL_DATA_TYPE = JDBC2ODBC(column_object[U("sql_DATA_TYPE")].as_integer());
+    }
+    */
+#endif
 
 	return result;
 }
@@ -73,13 +115,15 @@ std::unique_ptr<MetadataResponse> MetadataResponseFromJSON(web::json::value & ob
 	std::unique_ptr<MetadataResponse> result(new MetadataResponse());
 	web::json::array& tableMetaArray = object.as_array();
 
-	for (auto iter = tableMetaArray.begin(); iter != tableMetaArray.end(); ++iter) {
-		result->tableMetas.push_back(TableMetaFromJSON(*iter));
-		web::json::value& columns = (*iter)[U("columns")];
+    for (auto outer_iter = tableMetaArray.begin(); outer_iter != tableMetaArray.end(); ++outer_iter) {
+        result->tableMetas.push_back(TableMetaFromJSON(*outer_iter));
+        web::json::value& columns = (*outer_iter)[U("columns")];
 		web::json::array& columnsMetaArray = columns.as_array();
 
+        unsigned int inner_count = 1;
 		for (auto inner_iter = columnsMetaArray.begin(); inner_iter != columnsMetaArray.end(); ++inner_iter) {
-			result->columnMetas.push_back(ColumnMetaFromJSON(*inner_iter));
+            result->columnMetas.push_back(ColumnMetaFromJSON(*outer_iter, *inner_iter, inner_count));
+            inner_count++;
 		}
 	}
 
