@@ -46,7 +46,6 @@ static RETCODE SQL_API _SQLFreeEnv(pODBCEnv pHandle);
 // -----------------------------------------------------------------------
 // to allocate a environment
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLAllocEnv(HENV* pOutputHandlePtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLAllocEnv called"));
     pODBCEnv env = NULL;
@@ -81,7 +80,6 @@ RETCODE SQL_API SQLAllocEnv(HENV* pOutputHandlePtr) {
 // -----------------------------------------------------------------------
 // to allocate a connection
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLAllocConnect(HENV pEnvHandle, HDBC* pOutputHandlePtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLAllocConnect called"));
     pODBCConn conn;
@@ -125,7 +123,6 @@ RETCODE SQL_API SQLAllocConnect(HENV pEnvHandle, HDBC* pOutputHandlePtr) {
 // -----------------------------------------------------------------------
 // to allocate a statement
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLAllocStmt(HDBC pConnHandle, HSTMT* pOutputHandlePtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLAllocStmt called"));
     pODBCStmt stmt = NULL;
@@ -175,7 +172,6 @@ RETCODE SQL_API SQLAllocStmt(HDBC pConnHandle, HSTMT* pOutputHandlePtr) {
 // -----------------------------------------------------------------------
 // to allocate a handle for env, conn or stmt
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLAllocHandle(SQLSMALLINT pHandleType, SQLHANDLE pInputHandle, SQLHANDLE*  pOutputHandlePtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLAllocHandle called"));
 
@@ -200,7 +196,6 @@ RETCODE SQL_API SQLAllocHandle(SQLSMALLINT pHandleType, SQLHANDLE pInputHandle, 
 // -----------------------------------------------------------------------
 // to free an existing statement handle
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLFreeStmt(SQLHSTMT pStmt, SQLUSMALLINT pOption) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "SQLFreeStmt called, %d with option %d", pStmt, pOption));
     __CHK_HANDLE(pStmt, SQL_HANDLE_STMT, SQL_ERROR);
@@ -225,7 +220,6 @@ RETCODE SQL_API SQLFreeStmt(SQLHSTMT pStmt, SQLUSMALLINT pOption) {
 // -----------------------------------------------------------------------
 // to disconnect from sever is a state is maintained on a connection
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLDisconnect(HDBC pHandle) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "SQLDisconnect called"));
     __CHK_HANDLE(pHandle, SQL_HANDLE_DBC, SQL_ERROR);
@@ -239,7 +233,6 @@ RETCODE SQL_API SQLDisconnect(HDBC pHandle) {
 // -----------------------------------------------------------------------
 // to free an existing connection handle
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLFreeConnect(HDBC pHandle) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "SQLFreeConnect called"));
     __CHK_HANDLE(pHandle, SQL_HANDLE_DBC, SQL_ERROR);
@@ -252,7 +245,6 @@ RETCODE SQL_API SQLFreeConnect(HDBC pHandle) {
 // -----------------------------------------------------------------------
 // to free an existing environment handle
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLFreeEnv(HENV pHandle) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "SQLFreeEnv called"));
     __CHK_HANDLE(pHandle, SQL_HANDLE_ENV, SQL_ERROR);
@@ -263,7 +255,6 @@ RETCODE SQL_API SQLFreeEnv(HENV pHandle) {
 // -----------------------------------------------------------------------
 // to free an environment, connection or stmt
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLFreeHandle(SQLSMALLINT pHandleType, SQLHANDLE pHandle) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "SQLFreeHandle called, Handle Type: %d, Handle: %d",
         pHandleType, (Long)pHandle));
@@ -291,7 +282,6 @@ RETCODE SQL_API SQLFreeHandle(SQLSMALLINT pHandleType, SQLHANDLE pHandle) {
 // -----------------------------------------------------------------------
 // to attach a new stmt to STMT link list in CONN
 // -----------------------------------------------------------------------
-
 static eGoodBad _SQLAttachStmt(pODBCConn pConn, pODBCStmt pStmt) {
     pODBCStmt l;
 
@@ -325,7 +315,6 @@ static eGoodBad _SQLAttachStmt(pODBCConn pConn, pODBCStmt pStmt) {
 // -----------------------------------------------------------------------
 // to detach an existing stmt from link list
 // -----------------------------------------------------------------------
-
 static eGoodBad _SQLDetachStmt(pODBCConn pConn, pODBCStmt pStmt) {
     // precaution
     if (pConn == NULL || pStmt == NULL) {
@@ -351,7 +340,6 @@ static eGoodBad _SQLDetachStmt(pODBCConn pConn, pODBCStmt pStmt) {
 // -----------------------------------------------------------------------
 // free the cursor/results associated with the specified stmt
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeStmtResult(pODBCStmt pHandle) {
     // note
     // assumes handle already checked
@@ -377,7 +365,6 @@ static RETCODE SQL_API _SQLFreeStmtResult(pODBCStmt pHandle) {
 // -----------------------------------------------------------------------
 // free all the cols bound to a specified stmt
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeStmtCols(pODBCStmt pHandle) {
     // note
     // assumes handle already checked
@@ -387,7 +374,6 @@ static RETCODE SQL_API _SQLFreeStmtCols(pODBCStmt pHandle) {
 // -----------------------------------------------------------------------
 // free all the params bound to a particular stmt
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeStmtParams(pODBCStmt pHandle) {
     // note always called as a sub-function so no diag reset
     // to be implemented along with
@@ -398,7 +384,6 @@ static RETCODE SQL_API _SQLFreeStmtParams(pODBCStmt pHandle) {
 // -----------------------------------------------------------------------
 // to free the stmt itself  & others associated items like ARD, APD etc
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeStmtAll(pODBCStmt pHandle) {
     _SQLFreeDiag(_DIAGSTMT(pHandle));
     // note always called as a sub-function so no diag reset
@@ -427,7 +412,6 @@ static RETCODE SQL_API _SQLFreeStmtAll(pODBCStmt pHandle) {
 // -----------------------------------------------------------------------
 // to all the stmts starting from the specified stmt
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeStmts(pODBCStmt pHandle) {
     pODBCStmt t, n;
 
@@ -444,7 +428,6 @@ static RETCODE SQL_API _SQLFreeStmts(pODBCStmt pHandle) {
 // -----------------------------------------------------------------------
 // to attach a new conn to CONN link list in ENV
 // -----------------------------------------------------------------------
-
 static eGoodBad _SQLAttachConn(pODBCEnv pEnv, pODBCConn pConn) {
     pODBCConn l;
 
@@ -478,7 +461,6 @@ static eGoodBad _SQLAttachConn(pODBCEnv pEnv, pODBCConn pConn) {
 // -----------------------------------------------------------------------
 // to detach an existing item from ARD link-list
 // -----------------------------------------------------------------------
-
 static eGoodBad _SQLDetachConn(pODBCEnv pEnv, pODBCConn pConn) {
     // precaution
     if (pEnv == NULL || pConn == NULL) {
@@ -504,7 +486,6 @@ static eGoodBad _SQLDetachConn(pODBCEnv pEnv, pODBCConn pConn) {
 // -----------------------------------------------------------------------
 // to free all info associated with a connection but not the conenction itself
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLDisconnect(pODBCConn pHandle) {
     pHandle->IsConnected = FALSE;
 
@@ -553,7 +534,6 @@ RETCODE SQL_API _SQLDisconnect(pODBCConn pHandle) {
 // -----------------------------------------------------------------------
 // to free a specifed connection, plucks from parent/list AND FREEs it
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeConnect(pODBCConn pHandle) {
     _SQLFreeDiag(_DIAGCONN(pHandle));
     pODBCEnv env;
@@ -577,7 +557,6 @@ static RETCODE SQL_API _SQLFreeConnect(pODBCConn pHandle) {
 // -----------------------------------------------------------------------
 // to all the connections starting from the specified connection
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeConnects(pODBCConn pHandle) {
     pODBCConn t, n;
 
@@ -594,7 +573,6 @@ static RETCODE SQL_API _SQLFreeConnects(pODBCConn pHandle) {
 // -----------------------------------------------------------------------
 // to free the specified env
 // -----------------------------------------------------------------------
-
 static RETCODE SQL_API _SQLFreeEnv(pODBCEnv pHandle) {
     // free diags if any
     _SQLFreeDiag(_DIAGENV(pHandle));

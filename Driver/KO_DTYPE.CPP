@@ -39,57 +39,52 @@ eGoodBad            GetIRDDataTypeDefaults(CStrPtr pDataType, Word* pSqlDataType
 // -----------------------------------------------------------------------
 // to check if the specified type is a valid SQL data type
 // -----------------------------------------------------------------------
-
 eGoodBad _SQLCheckDataType(Word pDataType) {
     switch (pDataType) {
-    case SQL_CHAR:
-    case SQL_VARCHAR:
-    case SQL_WCHAR:
-    case SQL_WVARCHAR:
-    case SQL_C_SSHORT:
-    case SQL_C_USHORT:
-    case SQL_SMALLINT:
-    case SQL_C_SLONG:
-    case SQL_C_ULONG:
-    case SQL_INTEGER:
-    case SQL_NUMERIC:
-    case SQL_DECIMAL:
-    case SQL_FLOAT:
-    case SQL_REAL:
-    case SQL_DOUBLE:
-    case SQL_TYPE_DATE:
-    case SQL_TYPE_TIME:
-    case SQL_TYPE_TIMESTAMP:
-    case SQL_BIT:
-    case SQL_DEFAULT:
-    case SQL_C_SBIGINT:
-    case SQL_C_UBIGINT:
-    case SQL_C_TINYINT:
-    case SQL_C_STINYINT:
-    case SQL_C_UTINYINT:
-        return GOOD;
+        case SQL_CHAR:
+        case SQL_VARCHAR:
+        case SQL_WCHAR:
+        case SQL_WVARCHAR:
+        case SQL_C_SSHORT:
+        case SQL_C_USHORT:
+        case SQL_SMALLINT:
+        case SQL_C_SLONG:
+        case SQL_C_ULONG:
+        case SQL_INTEGER:
+        case SQL_NUMERIC:
+        case SQL_DECIMAL:
+        case SQL_FLOAT:
+        case SQL_REAL:
+        case SQL_DOUBLE:
+        case SQL_TYPE_DATE:
+        case SQL_TYPE_TIME:
+        case SQL_TYPE_TIMESTAMP:
+        case SQL_BIT:
+        case SQL_DEFAULT:
+        case SQL_C_SBIGINT:
+        case SQL_C_UBIGINT:
+        case SQL_C_TINYINT:
+        case SQL_C_STINYINT:
+        case SQL_C_UTINYINT:
+            return GOOD;
 
-    default:
-        __ODBCPOPMSG(_ODBCPopMsg("_SQLCheckDataType: Unknown data type: %d", pDataType));
-        return BAD;
+        default:
+            __ODBCPOPMSG(_ODBCPopMsg("_SQLCheckDataType: Unknown data type: %d", pDataType));
+            return BAD;
     }
 }
-
 
 // -----------------------------------------------------------------------
 // to check if the specified type is a valid interval code
 // -----------------------------------------------------------------------
-
 eGoodBad _SQLCheckIntervalCode(Word pIntervalCode) {
     // can check the interval code
     return GOOD;
 }
 
-
 // -----------------------------------------------------------------------
 // to set the value of data type and interval codes in descriptors
 // -----------------------------------------------------------------------
-
 eGoodBad _SQLSetDataType(pODBCDiag pDiag, Word pFldID, Word pFldValue, Word* pVerboseDataType,
     Word* pConciseDataType, Word* pDateTimeIntervalCode) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "_SQLSetDataType is called, pFldID:%d, pFldValue:%d", pFldID, pFldValue));
@@ -111,114 +106,113 @@ eGoodBad _SQLSetDataType(pODBCDiag pDiag, Word pFldID, Word pFldValue, Word* pVe
 
         // based on concise type set the verbose type and datetime interval
         switch (concise_type) {
-        case SQL_TYPE_DATE:
-            //case SQL_C_TYPE_DATE:
-            verbose_type = SQL_DATETIME;
-            datetime_interval = SQL_CODE_DATE;
-            break;
+            case SQL_TYPE_DATE:
+                //case SQL_C_TYPE_DATE:
+                verbose_type = SQL_DATETIME;
+                datetime_interval = SQL_CODE_DATE;
+                break;
 
-        case SQL_TYPE_TIME:
-            //case SQL_C_TYPE_TIME:
-            verbose_type = SQL_DATETIME;
-            datetime_interval = SQL_CODE_TIME;
-            break;
+            case SQL_TYPE_TIME:
+                //case SQL_C_TYPE_TIME:
+                verbose_type = SQL_DATETIME;
+                datetime_interval = SQL_CODE_TIME;
+                break;
 
-        case SQL_TYPE_TIMESTAMP:
-            //case SQL_C_TYPE_TIMESTAMP:
-            verbose_type = SQL_DATETIME;
-            datetime_interval = SQL_CODE_TIMESTAMP;
-            break;
+            case SQL_TYPE_TIMESTAMP:
+                //case SQL_C_TYPE_TIMESTAMP:
+                verbose_type = SQL_DATETIME;
+                datetime_interval = SQL_CODE_TIMESTAMP;
+                break;
 
-        case SQL_INTERVAL_MONTH:
-            //case SQL_C_INTERVAL_MONTH:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_MONTH;
-            break;
+            case SQL_INTERVAL_MONTH:
+                //case SQL_C_INTERVAL_MONTH:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_MONTH;
+                break;
 
-        case SQL_INTERVAL_YEAR:
-            //case SQL_C_INTERVAL_YEAR:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_YEAR;
-            break;
+            case SQL_INTERVAL_YEAR:
+                //case SQL_C_INTERVAL_YEAR:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_YEAR;
+                break;
 
-        case SQL_INTERVAL_YEAR_TO_MONTH:
-            //case SQL_C_INTERVAL_YEAR_TO_MONTH:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_YEAR_TO_MONTH;
-            break;
+            case SQL_INTERVAL_YEAR_TO_MONTH:
+                //case SQL_C_INTERVAL_YEAR_TO_MONTH:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_YEAR_TO_MONTH;
+                break;
 
-        case SQL_INTERVAL_DAY:
-            //case SQL_C_INTERVAL_DAY:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_DAY;
-            break;
+            case SQL_INTERVAL_DAY:
+                //case SQL_C_INTERVAL_DAY:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_DAY;
+                break;
 
-        case SQL_INTERVAL_HOUR:
-            //case SQL_C_INTERVAL_HOUR:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_HOUR;
-            break;
+            case SQL_INTERVAL_HOUR:
+                //case SQL_C_INTERVAL_HOUR:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_HOUR;
+                break;
 
-        case SQL_INTERVAL_MINUTE:
-            //case SQL_C_INTERVAL_MINUTE:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_MINUTE;
-            break;
+            case SQL_INTERVAL_MINUTE:
+                //case SQL_C_INTERVAL_MINUTE:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_MINUTE;
+                break;
 
-        case SQL_INTERVAL_SECOND:
-            //case SQL_C_INTERVAL_SECOND:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_SECOND;
-            break;
+            case SQL_INTERVAL_SECOND:
+                //case SQL_C_INTERVAL_SECOND:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_SECOND;
+                break;
 
-        case SQL_INTERVAL_DAY_TO_HOUR:
-            //case SQL_C_INTERVAL_DAY_TOHOUR:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_DAY_TO_HOUR;
-            break;
+            case SQL_INTERVAL_DAY_TO_HOUR:
+                //case SQL_C_INTERVAL_DAY_TOHOUR:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_DAY_TO_HOUR;
+                break;
 
-        case SQL_INTERVAL_DAY_TO_MINUTE:
-            //case SQL_C_INTERVAL_DAY_TO_MINUTE:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_DAY_TO_MINUTE;
-            break;
+            case SQL_INTERVAL_DAY_TO_MINUTE:
+                //case SQL_C_INTERVAL_DAY_TO_MINUTE:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_DAY_TO_MINUTE;
+                break;
 
-        case SQL_INTERVAL_DAY_TO_SECOND:
-            //case SQL_C_INTERVAL_DAY_TO_SECOND:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_DAY_TO_SECOND;
-            break;
+            case SQL_INTERVAL_DAY_TO_SECOND:
+                //case SQL_C_INTERVAL_DAY_TO_SECOND:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_DAY_TO_SECOND;
+                break;
 
-        case SQL_INTERVAL_HOUR_TO_MINUTE:
-            //case SQL_C_INTERVAL_HOUR_TO_MINUTE:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_HOUR_TO_MINUTE;
-            break;
+            case SQL_INTERVAL_HOUR_TO_MINUTE:
+                //case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_HOUR_TO_MINUTE;
+                break;
 
-        case SQL_INTERVAL_HOUR_TO_SECOND:
-            //case SQL_C_INTERVAL_HOUR_TO_SECOND:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_HOUR_TO_SECOND;
-            break;
+            case SQL_INTERVAL_HOUR_TO_SECOND:
+                //case SQL_C_INTERVAL_HOUR_TO_SECOND:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_HOUR_TO_SECOND;
+                break;
 
-        case SQL_INTERVAL_MINUTE_TO_SECOND:
-            //case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-            verbose_type = SQL_INTERVAL;
-            datetime_interval = SQL_CODE_MINUTE_TO_SECOND;
-            break;
+            case SQL_INTERVAL_MINUTE_TO_SECOND:
+                //case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+                verbose_type = SQL_INTERVAL;
+                datetime_interval = SQL_CODE_MINUTE_TO_SECOND;
+                break;
 
-        default:
+            default:
 
-            // check if data type if valid
-            if (_SQLCheckDataType(concise_type) != GOOD)
-            {
-                return BAD;
-            }
+                // check if data type if valid
+                if (_SQLCheckDataType(concise_type) != GOOD) {
+                    return BAD;
+                }
 
-            // concise type does not relate to datetime or interval
-            // hence both concise and verbose type r equal
-            verbose_type = concise_type;
-            datetime_interval = 0;
+                // concise type does not relate to datetime or interval
+                // hence both concise and verbose type r equal
+                verbose_type = concise_type;
+                datetime_interval = 0;
         }
     }
 
@@ -229,110 +223,108 @@ eGoodBad _SQLSetDataType(pODBCDiag pDiag, Word pFldID, Word pFldValue, Word* pVe
 
         // based on verbose type & datetime interval code determine concise type
         switch (verbose_type) {
-        case SQL_INTERVAL:
-            switch (datetime_interval) {
-            case SQL_CODE_DATE:
-                concise_type = SQL_TYPE_DATE;
+            case SQL_INTERVAL:
+                switch (datetime_interval) {
+                    case SQL_CODE_DATE:
+                        concise_type = SQL_TYPE_DATE;
+                        break;
+
+                    case SQL_CODE_TIME:
+                        concise_type = SQL_TYPE_TIME;
+                        break;
+
+                    case SQL_CODE_TIMESTAMP:
+                        concise_type = SQL_TYPE_TIMESTAMP;
+                        break;
+
+                    default:
+                        // interval should have been set
+                        __ODBCPOPMSG(_ODBCPopMsg("_SQLSetDataType: Interval code not yet set for SQL_INTERVAL"));
+                        return BAD;
+                }
+
                 break;
 
-            case SQL_CODE_TIME:
-                concise_type = SQL_TYPE_TIME;
-                break;
+            case SQL_DATETIME:
+                switch (datetime_interval) {
+                    case SQL_CODE_MONTH:
+                        concise_type = SQL_INTERVAL_MONTH;
+                        break;
 
-            case SQL_CODE_TIMESTAMP:
-                concise_type = SQL_TYPE_TIMESTAMP;
+                    case SQL_CODE_YEAR:
+                        concise_type = SQL_INTERVAL_YEAR;
+                        break;
+
+                    case SQL_CODE_YEAR_TO_MONTH:
+                        concise_type = SQL_INTERVAL_YEAR_TO_MONTH;
+                        break;
+
+                    case SQL_CODE_DAY:
+                        concise_type = SQL_INTERVAL_DAY;
+                        break;
+
+                    case SQL_CODE_HOUR:
+                        concise_type = SQL_INTERVAL_HOUR;
+                        break;
+
+                    case SQL_CODE_MINUTE:
+                        concise_type = SQL_INTERVAL_MINUTE;
+                        break;
+
+                    case SQL_CODE_SECOND:
+                        concise_type = SQL_INTERVAL_SECOND;
+                        break;
+
+                    case SQL_CODE_DAY_TO_HOUR:
+                        concise_type = SQL_INTERVAL_DAY_TO_HOUR;
+                        break;
+
+                    case SQL_CODE_DAY_TO_MINUTE:
+                        concise_type = SQL_INTERVAL_DAY_TO_MINUTE;
+                        break;
+
+                    case SQL_CODE_DAY_TO_SECOND:
+                        concise_type = SQL_INTERVAL_DAY_TO_SECOND;
+                        break;
+
+                    case SQL_CODE_HOUR_TO_MINUTE:
+                        concise_type = SQL_INTERVAL_HOUR_TO_MINUTE;
+                        break;
+
+                    case SQL_CODE_HOUR_TO_SECOND:
+                        concise_type = SQL_INTERVAL_HOUR_TO_SECOND;
+                        break;
+
+                    case SQL_CODE_MINUTE_TO_SECOND:
+                        concise_type = SQL_INTERVAL_MINUTE_TO_SECOND;
+                        break;
+
+                    default:
+                        // interval should have been set
+                        __ODBCPOPMSG(_ODBCPopMsg("_SQLSetDataType: Interval code not yet set for SQL_DATETIME"));
+                        return BAD;
+                }
+
                 break;
 
             default:
-                // interval should have been set
-                __ODBCPOPMSG(_ODBCPopMsg("_SQLSetDataType: Interval code not yet set for SQL_INTERVAL"));
-                return BAD;
-            }
 
-            break;
+                // check if data type if valid
+                if (_SQLCheckDataType(verbose_type) != GOOD) {
+                    return BAD;
+                }
 
-        case SQL_DATETIME:
-            switch (datetime_interval) {
-            case SQL_CODE_MONTH:
-                concise_type = SQL_INTERVAL_MONTH;
+                // verbose type does not relate to datetime or interval
+                // hence both concise and verbose type r equal
+                concise_type = verbose_type;
+                datetime_interval = 0;
                 break;
-
-            case SQL_CODE_YEAR:
-                concise_type = SQL_INTERVAL_YEAR;
-                break;
-
-            case SQL_CODE_YEAR_TO_MONTH:
-                concise_type = SQL_INTERVAL_YEAR_TO_MONTH;
-                break;
-
-            case SQL_CODE_DAY:
-                concise_type = SQL_INTERVAL_DAY;
-                break;
-
-            case SQL_CODE_HOUR:
-                concise_type = SQL_INTERVAL_HOUR;
-                break;
-
-            case SQL_CODE_MINUTE:
-                concise_type = SQL_INTERVAL_MINUTE;
-                break;
-
-            case SQL_CODE_SECOND:
-                concise_type = SQL_INTERVAL_SECOND;
-                break;
-
-            case SQL_CODE_DAY_TO_HOUR:
-                concise_type = SQL_INTERVAL_DAY_TO_HOUR;
-                break;
-
-            case SQL_CODE_DAY_TO_MINUTE:
-                concise_type = SQL_INTERVAL_DAY_TO_MINUTE;
-                break;
-
-            case SQL_CODE_DAY_TO_SECOND:
-                concise_type = SQL_INTERVAL_DAY_TO_SECOND;
-                break;
-
-            case SQL_CODE_HOUR_TO_MINUTE:
-                concise_type = SQL_INTERVAL_HOUR_TO_MINUTE;
-                break;
-
-            case SQL_CODE_HOUR_TO_SECOND:
-                concise_type = SQL_INTERVAL_HOUR_TO_SECOND;
-                break;
-
-            case SQL_CODE_MINUTE_TO_SECOND:
-                concise_type = SQL_INTERVAL_MINUTE_TO_SECOND;
-                break;
-
-            default:
-                // interval should have been set
-                __ODBCPOPMSG(_ODBCPopMsg("_SQLSetDataType: Interval code not yet set for SQL_DATETIME"));
-                return BAD;
-            }
-
-            break;
-
-        default:
-
-            // check if data type if valid
-            if (_SQLCheckDataType(verbose_type) != GOOD)
-            {
-                return BAD;
-            }
-
-            // verbose type does not relate to datetime or interval
-            // hence both concise and verbose type r equal
-            concise_type = verbose_type;
-            datetime_interval = 0;
-            break;
         }
     }
 
     else if (pFldID == SQL_DESC_DATETIME_INTERVAL_CODE) {
         // check if date interval code is valid
-        if (_SQLCheckIntervalCode(pFldValue) != GOOD)
-        {
+        if (_SQLCheckIntervalCode(pFldValue) != GOOD) {
             return BAD;
         }
 
@@ -347,11 +339,11 @@ eGoodBad _SQLSetDataType(pODBCDiag pDiag, Word pFldID, Word pFldValue, Word* pVe
     }
 
     // pass back values to caller
-    if (pVerboseDataType)         { *pVerboseDataType = verbose_type; }
+    if (pVerboseDataType) { *pVerboseDataType = verbose_type; }
 
-    if (pConciseDataType)         { *pConciseDataType = concise_type; }
+    if (pConciseDataType) { *pConciseDataType = concise_type; }
 
-    if (pDateTimeIntervalCode)    { *pDateTimeIntervalCode = datetime_interval; }
+    if (pDateTimeIntervalCode) { *pDateTimeIntervalCode = datetime_interval; }
 
     return GOOD;
 }
@@ -359,7 +351,6 @@ eGoodBad _SQLSetDataType(pODBCDiag pDiag, Word pFldID, Word pFldValue, Word* pVe
 // -----------------------------------------------------------------------
 // to get specific detail about a data type
 // -----------------------------------------------------------------------
-
 eGoodBad GetIRDDataTypeDefaults(CStrPtr pDataType, Word* pSqlDataType, Word* pNativeDataType, Word* pPrecision,
     Word* pScale, Long* pLength, Long* pRadix) {
     return BAD;

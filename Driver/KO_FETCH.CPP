@@ -82,8 +82,6 @@ SQLRowContent* GetIfExist(std::vector<SQLRowContent*>& container, int index);
 // to get specific detail//attribute about a col returned from server --- FROM IRD
 // kylin specific
 // -----------------------------------------------------------------------
-
-
 RETCODE  _SQLColAttribute_basic(
     SQLHSTMT pStmt,
     SQLUSMALLINT    pColNum,
@@ -128,88 +126,84 @@ RETCODE  _SQLColAttribute_basic(
     // get value from descriptor as per field type
     switch (pFldID) {
         // numeric types clubbed together
-    case SQL_DESC_AUTO_UNIQUE_VALUE:                // is col auto-incrementing
-    case SQL_DESC_CASE_SENSITIVE:                   // is col case-insensitive
-    case SQL_DESC_TYPE:                             // verbose type
-    case SQL_DESC_CONCISE_TYPE:                     // concise type
-    case SQL_DESC_COUNT:                            // no.of highest bound column
-    case SQL_DESC_LENGTH:
-    case SQL_DESC_DISPLAY_SIZE:
-    case SQL_DESC_OCTET_LENGTH:
-    case SQL_DESC_FIXED_PREC_SCALE:
-    case SQL_DESC_NULLABLE:
-    case SQL_DESC_NUM_PREC_RADIX:
-    case SQL_DESC_PRECISION:
-    case SQL_DESC_SCALE:
-    case SQL_DESC_SEARCHABLE:
-    case SQL_DESC_UNNAMED:
-    case SQL_DESC_UNSIGNED:
-    case SQL_DESC_UPDATABLE:
-        _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, pFldID, pNumValuePtr, -1, NULL, isANSI);
-        break;
+        case SQL_DESC_AUTO_UNIQUE_VALUE:                // is col auto-incrementing
+        case SQL_DESC_CASE_SENSITIVE:                   // is col case-insensitive
+        case SQL_DESC_TYPE:                             // verbose type
+        case SQL_DESC_CONCISE_TYPE:                     // concise type
+        case SQL_DESC_COUNT:                            // no.of highest bound column
+        case SQL_DESC_LENGTH:
+        case SQL_DESC_DISPLAY_SIZE:
+        case SQL_DESC_OCTET_LENGTH:
+        case SQL_DESC_FIXED_PREC_SCALE:
+        case SQL_DESC_NULLABLE:
+        case SQL_DESC_NUM_PREC_RADIX:
+        case SQL_DESC_PRECISION:
+        case SQL_DESC_SCALE:
+        case SQL_DESC_SEARCHABLE:
+        case SQL_DESC_UNNAMED:
+        case SQL_DESC_UNSIGNED:
+        case SQL_DESC_UPDATABLE:
+            _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, pFldID, pNumValuePtr, -1, NULL, isANSI);
+            break;
 
-        // char types clubbed together
+            // char types clubbed together
 
-    case SQL_DESC_BASE_TABLE_NAME:                  // table name for column
-    case SQL_DESC_CATALOG_NAME:                     // database name
-    case SQL_DESC_LITERAL_PREFIX:
-    case SQL_DESC_LITERAL_SUFFIX:
-    case SQL_DESC_LOCAL_TYPE_NAME:
-    case SQL_DESC_TYPE_NAME:
-    case SQL_DESC_SCHEMA_NAME:
-    case SQL_DESC_TABLE_NAME:
-        _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, pFldID, pDataPtr, pDataSize,
-            pDataSizePtr ? &n : NULL, isANSI);
+        case SQL_DESC_BASE_TABLE_NAME:                  // table name for column
+        case SQL_DESC_CATALOG_NAME:                     // database name
+        case SQL_DESC_LITERAL_PREFIX:
+        case SQL_DESC_LITERAL_SUFFIX:
+        case SQL_DESC_LOCAL_TYPE_NAME:
+        case SQL_DESC_TYPE_NAME:
+        case SQL_DESC_SCHEMA_NAME:
+        case SQL_DESC_TABLE_NAME:
+            _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, pFldID, pDataPtr, pDataSize,
+                pDataSizePtr ? &n : NULL, isANSI);
 
-        if (pDataSizePtr)
-        {
-            *pDataSizePtr = (Word)n;
-        }
+            if (pDataSizePtr) {
+                *pDataSizePtr = (Word)n;
+            }
 
-        break;
+            break;
 
-    case SQL_DESC_BASE_COLUMN_NAME:
-    case SQL_DESC_LABEL:
-    case SQL_DESC_NAME:
-        // ////
-        // as a special case the name length may be required without the actual name
-        //////
-        StrPtr cname;
-        Word   cnamesize;
+        case SQL_DESC_BASE_COLUMN_NAME:
+        case SQL_DESC_LABEL:
+        case SQL_DESC_NAME:
+            // ////
+            // as a special case the name length may be required without the actual name
+            //////
+            StrPtr cname;
+            Word   cnamesize;
 
-        if (pDataPtr) {
-            cname = (StrPtr)pDataPtr;
-            cnamesize = pDataSize;
-        }
+            if (pDataPtr) {
+                cname = (StrPtr)pDataPtr;
+                cnamesize = pDataSize;
+            }
 
-        else {
-            cname = new Char[256];             // arbitary
-            cnamesize = 255;
-        }
+            else {
+                cname = new Char[256];             // arbitary
+                cnamesize = 255;
+            }
 
-        _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, pFldID, cname, cnamesize,
-            pDataSizePtr ? &n : NULL, isANSI);
+            _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, pFldID, cname, cnamesize,
+                pDataSizePtr ? &n : NULL, isANSI);
 
-        if (pDataPtr == NULL)
-        {
-            delete[] cname;
-        }
+            if (pDataPtr == NULL) {
+                delete[] cname;
+            }
 
-        if (pDataSizePtr)
-        {
-            *pDataSizePtr = (Word)n;
-        }
+            if (pDataSizePtr) {
+                *pDataSizePtr = (Word)n;
+            }
 
-        break;
+            break;
 
-    default:
-        __ODBCPOPMSG(_ODBCPopMsg("SQLColAttribute unknown attr, ColNum: %d, FldID: %d\n", pColNum, pFldID));
-        return SQL_ERROR;
+        default:
+            __ODBCPOPMSG(_ODBCPopMsg("SQLColAttribute unknown attr, ColNum: %d, FldID: %d\n", pColNum, pFldID));
+            return SQL_ERROR;
     }
 
     return SQL_SUCCESS;
 }
-
 
 #ifdef _WIN64
 RETCODE SQL_API SQLColAttributeW ( SQLHSTMT        pStmt,
@@ -270,7 +264,6 @@ RETCODE SQL_API SQLColAttribute(
 // SQLDescribeCol returns the result descriptor ¡ª column name,type, column size, decimal digits, and nullability (from msdn)
 // kylin specific
 // ----------------------------------------------------------------------
-
 SQLRETURN SQL_API _SQLDescribeCol_basic(SQLHSTMT        pStmt,
     SQLUSMALLINT    pColNum,
     void*        pColNamePtr,
@@ -319,8 +312,7 @@ SQLRETURN SQL_API _SQLDescribeCol_basic(SQLHSTMT        pStmt,
         _SQLGetIRDItemField(&(((pODBCStmt)pStmt)->IRD), col, pColNum, SQL_DESC_BASE_COLUMN_NAME, pColNamePtr,
             pColNameSize, pColNameSizePtr ? &n : NULL, isANSI);
 
-        if (pColNameSizePtr)
-        {
+        if (pColNameSizePtr) {
             *pColNameSizePtr = (Word)n;
         }
 
@@ -399,7 +391,6 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT        pStmt,
 // to bind a column to with details from application --- TO ARD
 // kylin specific, no chagne required
 // -----------------------------------------------------------------------
-
 /*
 
     From msdn:
@@ -442,7 +433,7 @@ RETCODE SQL_API SQLBindCol(SQLHSTMT        pStmt,
             delete ardcol;
         }
 
-        else  {
+        else {
             // unbind/rebind col details
             _SQLSetARDItemField(ard, ardcol, pColNum, SQL_DESC_DATA_PTR, pDataPtr, -1);
             _SQLSetARDItemField(ard, ardcol, pColNum, SQL_DESC_CONCISE_TYPE, (void*)pDataType, -1);
@@ -484,12 +475,10 @@ RETCODE SQL_API SQLBindCol(SQLHSTMT        pStmt,
     return SQL_SUCCESS;
 }
 
-
 // ---------------------------------------------------------------------
 // to get the number of columns in result --- COUNTING ELEMENTS IN IRD.ROWDESC
 // Kylin specific
 // ---------------------------------------------------------------------
-
 RETCODE SQL_API SQLNumResultCols(SQLHSTMT pStmt, SQLSMALLINT*  pColCountPtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLNumResultCols called"));
     SQLResponse* rowdesc;
@@ -513,11 +502,9 @@ RETCODE SQL_API SQLNumResultCols(SQLHSTMT pStmt, SQLSMALLINT*  pColCountPtr) {
     return SQL_SUCCESS;
 }
 
-
 // ----------------------------------------------------------------------
 // to count the number of rows in the current result --- COUNTING ELEMENTS IN IRD
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API SQLRowCount(HSTMT pStmt, SQLLEN* pDataPtr) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLRowCount called"));
     __CHK_HANDLE(pStmt, SQL_HANDLE_STMT, SQL_ERROR);
@@ -531,7 +518,6 @@ RETCODE SQL_API SQLRowCount(HSTMT pStmt, SQLLEN* pDataPtr) {
 // -----------------------------------------------------------------------
 // to return the next row from the resultset
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLFetch(HSTMT pStmt) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLFetch called"));
     __CHK_HANDLE(pStmt, SQL_HANDLE_STMT, SQL_ERROR);
@@ -561,7 +547,6 @@ RETCODE SQL_API SQLFetch(HSTMT pStmt) {
 // to fetch the specified rowset of data from the result set
 // Version Introduced: ODBC 1.0 Standards Compliance: Deprecated  (from msdn)
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLExtendedFetch(SQLHSTMT        pStmt,
     SQLUSMALLINT    pFetchOrientation,
     SQLINTEGER      pFetchOffset,
@@ -584,25 +569,21 @@ RETCODE SQL_API SQLExtendedFetch(SQLHSTMT        pStmt,
     }
 
     // check if number of rows explicitly specified
-    if (pFetchOffset <= 0)
-    {
+    if (pFetchOffset <= 0) {
         n = ((pODBCStmt)pStmt)->ARD.RowArraySize;
     }
 
     // use default rowset size as a fallback
-    if (n <= 0)
-    {
+    if (n <= 0) {
         n = 1;
     }
 
     return _SQLFetch((pODBCStmt)pStmt, pFetchOrientation, n, pRowCountPtr, pRowStatusArray);
 }
 
-
 // -----------------------------------------------------------------------
 // to fetch the specified rowset of data from the result set
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLFetchScroll(SQLHSTMT        pStatementHandle,
     SQLSMALLINT     pFetchOrientation,
     SQLINTEGER      pFetchOffset) {
@@ -614,7 +595,6 @@ RETCODE SQL_API SQLFetchScroll(SQLHSTMT        pStatementHandle,
 // -----------------------------------------------------------------------
 // to retrieve long data for a single column in the result set using multiple calls
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLGetData(SQLHSTMT        pStmt,
     SQLUSMALLINT    pColNum,
     SQLSMALLINT     pgtType,
@@ -626,11 +606,9 @@ RETCODE SQL_API SQLGetData(SQLHSTMT        pStmt,
     return SQL_ERROR;
 }
 
-
 // -----------------------------------------------------------------------
 // to send data for a parameter or column to the driver at statement execution time
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLPutData(SQLHSTMT       pStmt,
     SQLPOINTER     pDataPtr,
     SQLINTEGER     pDataSize) {
@@ -642,7 +620,6 @@ RETCODE SQL_API SQLPutData(SQLHSTMT       pStmt,
 // -----------------------------------------------------------------------
 // to iterate through multiple resultsets
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLMoreResults(HSTMT pStmt) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLMoreResults called"));
     __ODBCPOPMSG(_ODBCPopMsg("SQLMoreResults not implemented"));
@@ -652,7 +629,6 @@ RETCODE SQL_API SQLMoreResults(HSTMT pStmt) {
 // -----------------------------------------------------------------------
 // to get a driver specific version of specified sql statement
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLNativeSql(SQLHDBC         pConn,
     SQLCHAR*        pInStmtText,
     SQLINTEGER      pInStmtTextLen,
@@ -664,13 +640,9 @@ RETCODE SQL_API SQLNativeSql(SQLHDBC         pConn,
     return SQL_ERROR;
 }
 
-
-
-
 // -----------------------------------------------------------------------
 // to convert and transfer col data for application
 // -----------------------------------------------------------------------
-
 //mhb TODO, check if the sqltype defined here match from c#
 RETCODE SQL_API _SQLColConvert(pODBCStmt       pStmt,
     void*               pTgtDataPtr,
@@ -698,115 +670,107 @@ RETCODE SQL_API _SQLColConvert(pODBCStmt       pStmt,
         // determine targettype based on data-source type
         // check out this http://msdn.microsoft.com/en-us/library/ms716298(v=vs.85).aspx for default type mapping
         switch (pSrcDataType) {
-        case SQL_CHAR:
-            pTgtDataType = SQL_C_CHAR;
-            break;
+            case SQL_CHAR:
+                pTgtDataType = SQL_C_CHAR;
+                break;
 
-        case SQL_VARCHAR:
-            pTgtDataType = SQL_C_CHAR;
-            break;
+            case SQL_VARCHAR:
+                pTgtDataType = SQL_C_CHAR;
+                break;
 
-        case SQL_WCHAR:
-            pTgtDataType = SQL_C_WCHAR;
-            break;
+            case SQL_WCHAR:
+                pTgtDataType = SQL_C_WCHAR;
+                break;
 
-        case SQL_WVARCHAR:
-            pTgtDataType = SQL_C_WCHAR;
-            break;
+            case SQL_WVARCHAR:
+                pTgtDataType = SQL_C_WCHAR;
+                break;
 
-        case SQL_DECIMAL:
-            pTgtDataType = SQL_C_CHAR;
-            break;
+            case SQL_DECIMAL:
+                pTgtDataType = SQL_C_CHAR;
+                break;
 
-        case SQL_BIT:
-            pTgtDataType = SQL_C_BIT;
-            break;
+            case SQL_BIT:
+                pTgtDataType = SQL_C_BIT;
+                break;
 
-        case SQL_TINYINT:
-            if (isSigned)
-            {
-                pTgtDataType = SQL_C_STINYINT;
-            }
+            case SQL_TINYINT:
+                if (isSigned) {
+                    pTgtDataType = SQL_C_STINYINT;
+                }
 
-            else
-            {
-                pTgtDataType = SQL_C_UTINYINT;
-            }
+                else {
+                    pTgtDataType = SQL_C_UTINYINT;
+                }
 
-            break;
+                break;
 
-        case SQL_SMALLINT:
-            if (isSigned)
-            {
-                pTgtDataType = SQL_C_SSHORT;
-            }
+            case SQL_SMALLINT:
+                if (isSigned) {
+                    pTgtDataType = SQL_C_SSHORT;
+                }
 
-            else
-            {
-                pTgtDataType = SQL_C_USHORT;
-            }
+                else {
+                    pTgtDataType = SQL_C_USHORT;
+                }
 
-            break;
+                break;
 
-        case SQL_INTEGER:
-            if (isSigned)
-            {
-                pTgtDataType = SQL_C_SLONG;
-            }
+            case SQL_INTEGER:
+                if (isSigned) {
+                    pTgtDataType = SQL_C_SLONG;
+                }
 
-            else
-            {
-                pTgtDataType = SQL_C_ULONG;
-            }
+                else {
+                    pTgtDataType = SQL_C_ULONG;
+                }
 
-            break;
+                break;
 
-        case SQL_BIGINT:
-            if (isSigned)
-            {
-                pTgtDataType = SQL_C_SBIGINT;
-            }
+            case SQL_BIGINT:
+                if (isSigned) {
+                    pTgtDataType = SQL_C_SBIGINT;
+                }
 
-            else
-            {
-                pTgtDataType = SQL_C_UBIGINT;
-            }
+                else {
+                    pTgtDataType = SQL_C_UBIGINT;
+                }
 
-            break;
+                break;
 
-        case SQL_FLOAT:
-            pTgtDataType = SQL_C_FLOAT;
-            break;
+            case SQL_FLOAT:
+                pTgtDataType = SQL_C_FLOAT;
+                break;
 
-        case SQL_DOUBLE:
-            pTgtDataType = SQL_C_DOUBLE;
-            break;
+            case SQL_DOUBLE:
+                pTgtDataType = SQL_C_DOUBLE;
+                break;
 
-        case SQL_TYPE_DATE:
-            pTgtDataType = SQL_C_CHAR;
-            break;
+            case SQL_TYPE_DATE:
+                pTgtDataType = SQL_C_CHAR;
+                break;
 
-        case SQL_TYPE_TIME:
-            pTgtDataType = SQL_C_CHAR;
-            break;
+            case SQL_TYPE_TIME:
+                pTgtDataType = SQL_C_CHAR;
+                break;
 
-        case SQL_TYPE_TIMESTAMP:
-            pTgtDataType = SQL_C_CHAR;
-            break;
+            case SQL_TYPE_TIMESTAMP:
+                pTgtDataType = SQL_C_CHAR;
+                break;
 
-            //case SQL_C_SLONG:
-            //case SQL_C_ULONG:               // unsigned long
-            //case SQL_C_USHORT:
-            //case SQL_C_SSHORT:
-            //case SQL_NUMERIC:
-            //case SQL_REAL:
-            //  pTgtDataType = pSrcDataType;
-            //  break;
+                //case SQL_C_SLONG:
+                //case SQL_C_ULONG:               // unsigned long
+                //case SQL_C_USHORT:
+                //case SQL_C_SSHORT:
+                //case SQL_NUMERIC:
+                //case SQL_REAL:
+                //  pTgtDataType = pSrcDataType;
+                //  break;
 
-        default:
-            __ODBCPOPMSG(_ODBCPopMsg("The data type %d not implemented", pSrcDataType));
-            return SQL_ERROR;
-            break;
+            default:
+                __ODBCPOPMSG(_ODBCPopMsg("The data type %d not implemented", pSrcDataType));
+                return SQL_ERROR;
+                break;
         }
     }
 
@@ -829,13 +793,11 @@ RETCODE SQL_API _SQLColConvert(pODBCStmt       pStmt,
             // prepare a converted single char bool string
             Char  src[2];
 
-            if (pTextInAnsi.get() == NULL)
-            {
+            if (pTextInAnsi.get() == NULL) {
                 src[0] = '0';
             }
 
-            else
-            {
+            else {
                 src[0] = (pTextInAnsi.get()[0] == 'T' || pTextInAnsi.get()[0] == '1' || pTextInAnsi.get()[0] == 't') ? '1' : '0';
             }
 
@@ -860,26 +822,26 @@ RETCODE SQL_API _SQLColConvert(pODBCStmt       pStmt,
     // try using a numeric conversion
     switch (_SQLCopyNumData(_DIAGSTMT(pStmt), pTgtDataPtr, pTgtDataType, pTextInAnsi.get(), pSrcDataType,
         pTgtDataSizePtr)) {
-    case -1:
-        return SQL_ERROR;
+        case -1:
+            return SQL_ERROR;
 
-    case 0:
-        return SQL_SUCCESS;
+        case 0:
+            return SQL_SUCCESS;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     // try using a date/time conversion
     switch (_SQLCopyDateTimeData(_DIAGSTMT(pStmt), pTgtDataPtr, pTgtDataType, pTextInAnsi.get(), pSrcDataType)) {
-    case -1:
-        return SQL_ERROR;
+        case -1:
+            return SQL_ERROR;
 
-    case 0:
-        return SQL_SUCCESS;
+        case 0:
+            return SQL_SUCCESS;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     // try using SQL_BIT data type ie bool
@@ -887,13 +849,11 @@ RETCODE SQL_API _SQLColConvert(pODBCStmt       pStmt,
         __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "the target data type is SQL_C_BIT"));
 
         // prepare a converted single char bool string
-        if (pTextInAnsi.get() == NULL)
-        {
+        if (pTextInAnsi.get() == NULL) {
             *((char*)pTgtDataPtr) = 0;
         }
 
-        else
-        {
+        else {
             *((char*)pTgtDataPtr) = (pTextInAnsi.get()[0] == 'T' || pTextInAnsi.get()[0] == '1' || pTextInAnsi.get()[0] == 't') ? 1 : 0;
         }
 
@@ -908,11 +868,9 @@ RETCODE SQL_API _SQLColConvert(pODBCStmt       pStmt,
     return SQL_ERROR;
 }
 
-
 // -----------------------------------------------------------------------
 // to get the specified column data from
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLFetchCol(pODBCStmt pStmt,
     pARDItem pARDCol, //ard
     SQLResponse* pRowDesc,// ird
@@ -958,9 +916,9 @@ RETCODE SQL_API _SQLFetchCol(pODBCStmt pStmt,
 
     // PRECAUTION
 
-    if (tgtdataptr)   { *((Char*)tgtdataptr) = 0; }
+    if (tgtdataptr) { *((Char*)tgtdataptr) = 0; }
 
-    if (tgtsizeptr)   { *((Long*)tgtsizeptr) = 0; }
+    if (tgtsizeptr) { *((Long*)tgtsizeptr) = 0; }
 
     // COLLECT AND CHECK
     // get col desc for specified col ( response )
@@ -1007,8 +965,7 @@ RETCODE SQL_API _SQLFetchCol(pODBCStmt pStmt,
     }
 
     // check if info about src is also available in ARD col
-    if (pARDCol->SrcDataType == 0)
-    {
+    if (pARDCol->SrcDataType == 0) {
         GetIRDColDescInfo(coldesc, &(pARDCol->SrcDataType), &(pARDCol->SrcDataPrecision), &(pARDCol->SrcDataScale), &(pARDCol->SrcDataSize));
     } // collect source data information in form comparable to appl
 
@@ -1025,11 +982,9 @@ RETCODE SQL_API _SQLFetchCol(pODBCStmt pStmt,
     return ret;
 }
 
-
 // -----------------------------------------------------------------------
 // to move to the next row with relevant checks
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLFetchMoveNext(pODBCStmt pStmt) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "_SQLFetch MoveNext is called"));
 
@@ -1063,8 +1018,7 @@ RETCODE SQL_API _SQLFetchMoveNext(pODBCStmt pStmt) {
             return SQL_NO_DATA;
         }
 
-        else
-        {
+        else {
             return SQL_SUCCESS;
         }
     }
@@ -1079,13 +1033,11 @@ RETCODE SQL_API _SQLFetchMoveNext(pODBCStmt pStmt) {
 SQLRowContent* GetIfExist(std::vector<SQLRowContent*>& container, int index) {
     index = index - 1; //sql cardinals start at 1
 
-    if (index >= (int)container.size())
-    {
+    if (index >= (int)container.size()) {
         return NULL;
     }
 
-    else
-    {
+    else {
         return container.at(index);
     }
 }
@@ -1093,7 +1045,6 @@ SQLRowContent* GetIfExist(std::vector<SQLRowContent*>& container, int index) {
 // -----------------------------------------------------------------------
 // to set the initial row positions for a fetch
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLResetRowPos(pODBCStmt pStmt) {
     // note
     // there r 2 row pointers one is the start row for the current fetch and
@@ -1131,8 +1082,7 @@ RETCODE SQL_API _SQLResetRowPos(pODBCStmt pStmt) {
             return SQL_NO_DATA;
         }
 
-        else
-        {
+        else {
             return SQL_SUCCESS;
         }
     }
@@ -1144,11 +1094,9 @@ RETCODE SQL_API _SQLResetRowPos(pODBCStmt pStmt) {
     }
 }
 
-
 // -----------------------------------------------------------------------
 // to return the next row from the resultset
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLFetch(pODBCStmt    pStmt,
     Word            pFetchOrientation,
     Long            pFetchOffset, //ARD.RowArraySize
@@ -1167,20 +1115,18 @@ RETCODE SQL_API _SQLFetch(pODBCStmt    pStmt,
     // CALLER SAFE
 
     // caller safe for row fetched
-    if (pRowCountPtr)
-    {
+    if (pRowCountPtr) {
         *pRowCountPtr = 0;
     }
 
     // caller safe for each row status
     if (pRowStatusArray)
-        for (i = 0; i < pFetchOffset; i++)   { pRowStatusArray[i] = SQL_ROW_NOROW; }
+        for (i = 0; i < pFetchOffset; i++) { pRowStatusArray[i] = SQL_ROW_NOROW; }
 
     // RESET POSITION OR SET INITIAL POSITIONS
 
     // postions the row counter for fetch start
-    if ((s = _SQLResetRowPos((pODBCStmt)pStmt)) != SQL_SUCCESS)
-    {
+    if ((s = _SQLResetRowPos((pODBCStmt)pStmt)) != SQL_SUCCESS) {
         return s;
     }
 
@@ -1199,15 +1145,15 @@ RETCODE SQL_API _SQLFetch(pODBCStmt    pStmt,
         if (i != 0) {
             // move to next row if not first time
             switch (_SQLFetchMoveNext(pStmt)) {
-            case SQL_NO_DATA:
-                flgNoData = TRUE;           // can continue
-                continue;
+                case SQL_NO_DATA:
+                    flgNoData = TRUE;           // can continue
+                    continue;
 
-            case SQL_ERROR:
-                return SQL_ERROR;           // not continuing
+                case SQL_ERROR:
+                    return SQL_ERROR;           // not continuing
 
-            default:                        // case SQL_SUCCESS:
-                break;
+                default:                        // case SQL_SUCCESS:
+                    break;
             }
         }
 
@@ -1224,22 +1170,22 @@ RETCODE SQL_API _SQLFetch(pODBCStmt    pStmt,
 
             // update row status
             switch (s) {
-            case SQL_SUCCESS:
-                if (pRowStatusArray && pRowStatusArray[i] == SQL_ROW_NOROW) { pRowStatusArray[i] = SQL_ROW_SUCCESS_WITH_INFO; }
+                case SQL_SUCCESS:
+                    if (pRowStatusArray && pRowStatusArray[i] == SQL_ROW_NOROW) { pRowStatusArray[i] = SQL_ROW_SUCCESS_WITH_INFO; }
 
-                break;
+                    break;
 
-            case SQL_SUCCESS_WITH_INFO:
-                ++n1;                  // rows with info
+                case SQL_SUCCESS_WITH_INFO:
+                    ++n1;                  // rows with info
 
-                if (pRowStatusArray) { pRowStatusArray[i - 1] = SQL_ROW_SUCCESS_WITH_INFO; }
+                    if (pRowStatusArray) { pRowStatusArray[i - 1] = SQL_ROW_SUCCESS_WITH_INFO; }
 
-                break;
+                    break;
 
-            default:
-                ++n2;                   // no. of rows with error
+                default:
+                    ++n2;                   // no. of rows with error
 
-                if (pRowStatusArray) { pRowStatusArray[i - 1] = SQL_ROW_ERROR; }
+                    if (pRowStatusArray) { pRowStatusArray[i - 1] = SQL_ROW_ERROR; }
             }
         }
 
@@ -1248,20 +1194,17 @@ RETCODE SQL_API _SQLFetch(pODBCStmt    pStmt,
     }
 
     // check if no data
-    if (flgNoData == TRUE && i <= 0)
-    {
+    if (flgNoData == TRUE && i <= 0) {
         return SQL_NO_DATA;
     }
 
     // check if all error
-    else if (i > 0 && n2 == i)
-    {
+    else if (i > 0 && n2 == i) {
         return SQL_ERROR;
     }
 
     // check if any success with info
-    else if (i > 0 && n1 > 0)
-    {
+    else if (i > 0 && n1 > 0) {
         return SQL_SUCCESS_WITH_INFO;
     }
 

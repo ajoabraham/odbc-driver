@@ -525,8 +525,8 @@ extern  Word        gLogUsage;
 // --------------------------- checking handles -------------------------------
 #define __CHK_HANDLE(h,t,r)   { \
         if(!(h)) { __ODBCPOPMSG(_ODBCPopMsg("Null handle!!!")); return r; } \
-                else if((h) && *(( Word* )(h)) != t ) { __ODBCPOPMSG(_ODBCPopMsg("Handle type does not match!!!")); return r; } \
-    }
+        else if((h) && *(( Word* )(h)) != t ) { __ODBCPOPMSG(_ODBCPopMsg("Handle type does not match!!!")); return r; } \
+}
 
 // ---------------------------- diag functions --------------------------------
 pODBCDiagRow     _SQLPutDiagRow(pODBCDiag pDiag, StrPtr pFunc, StrPtr pState, Long pNativeErrorCode,

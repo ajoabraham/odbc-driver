@@ -21,11 +21,9 @@
 eGoodBad    GetDateFromString(const char* pDateStr, struct tagDATE_STRUCT* pDateStruct);
 eGoodBad    GetTimestampFromString(const char* pDateStr, struct tagTIMESTAMP_STRUCT* pTimestampStruct);
 
-
 // ----------------------------------------------------------------------
 // to extract date from string assuming server format to be yyyy-mm-dd or yyyymmdd
 // ----------------------------------------------------------------------
-
 eGoodBad GetDateFromString(const char* pDateStr, struct tagDATE_STRUCT* pDateStruct) {
     char    val[5];
     short   x;
@@ -125,7 +123,6 @@ eGoodBad    GetTimestampFromString(const char* pStr, struct tagTIMESTAMP_STRUCT*
 // ----------------------------------------------------------------------
 // to create a copy of char data to specified tgt buffer
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLCopyCharData(pODBCDiag pDiag, void* pTgtDataPtr, Long pDataBufSize, void* pSizePtr,
     Word pSizePtrSize, CStrPtr pSrcData, Long pSrcDataSize) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG,
@@ -134,34 +131,29 @@ RETCODE SQL_API _SQLCopyCharData(pODBCDiag pDiag, void* pTgtDataPtr, Long pDataB
     Long    n;
 
     // caller safe
-    if (pTgtDataPtr)
-    {
+    if (pTgtDataPtr) {
         *((StrPtr)pTgtDataPtr) = 0;
     }
 
     // DATA SIZE
 
     // check source data to compute size
-    if (pSrcData && _stricmp((StrPtr)pSrcData, "NULL") != 0)
-    {
+    if (pSrcData && _stricmp((StrPtr)pSrcData, "NULL") != 0) {
         n = (pSrcDataSize < 0) ? strlen((StrPtr)pSrcData) : pSrcDataSize;
     }        // compute length based on whether null terminated
 
-    else
-    {
+    else {
         n = 0;
     }
 
     // check if there is a holder for size
     if (pSizePtr) {
         // set size as per ptr type 16-bt or 32-bit
-        if (pSizePtrSize == 16)
-        {
+        if (pSizePtrSize == 16) {
             *((Word*)pSizePtr) = (Word)n;
         }
 
-        else
-        {
+        else {
             *((Long*)pSizePtr) = n;
         }
     }
@@ -169,8 +161,7 @@ RETCODE SQL_API _SQLCopyCharData(pODBCDiag pDiag, void* pTgtDataPtr, Long pDataB
     // check if src data but no size holder
     else if (pSrcData) {
         // check if diag to be set
-        if (pDiag)
-        {
+        if (pDiag) {
             _SQLPutDiagRow(pDiag, "_SQLCopyCharData", "01000", -1, "No holder for data size", NULL);
         }
 
@@ -222,6 +213,7 @@ RETCODE SQL_API _SQLCopyWCharData(pODBCDiag pDiag, void* pTgtDataPtr, Long pData
     unique_ptr<wchar_t[]> pWCS(char2wchar(pSrcData));
     return _SQLCopyWCharDataW(pDiag, pTgtDataPtr, pDataBufSize, pSizePtr, pSizePtrSize, pWCS.get(), pSrcDataSize);
 }
+
 //mhb added, for those ard that accept wchar
 RETCODE SQL_API _SQLCopyWCharDataW(pODBCDiag pDiag, void* pTgtDataPtr, Long pDataBufSize, void* pSizePtr,
     Word pSizePtrSize, const wchar_t* pSrcData, Long pSrcDataSize) {
@@ -232,21 +224,18 @@ RETCODE SQL_API _SQLCopyWCharDataW(pODBCDiag pDiag, void* pTgtDataPtr, Long pDat
     Long    n;
 
     // caller safe
-    if (pTgtDataPtr)
-    {
+    if (pTgtDataPtr) {
         *((wchar_t*)pTgtDataPtr) = 0;
     }
 
     // DATA SIZE
 
     // check source data to compute size
-    if (pSrcData && _wcsicmp(pSrcData, L"NULL") != 0)
-    {
+    if (pSrcData && _wcsicmp(pSrcData, L"NULL") != 0) {
         n = (pSrcDataSize < 0) ? wcslen(pSrcData) : pSrcDataSize;
     }         // compute length based on whether null terminated
 
-    else
-    {
+    else {
         n = 0;
     }
 
@@ -255,13 +244,11 @@ RETCODE SQL_API _SQLCopyWCharDataW(pODBCDiag pDiag, void* pTgtDataPtr, Long pDat
         // set size as per ptr type 16-bt or 32-bit
 
         //should be number of characters
-        if (pSizePtrSize == 16)
-        {
+        if (pSizePtrSize == 16) {
             *((Word*)pSizePtr) = (Word)(2 * n);
         }
 
-        else
-        {
+        else {
             *((Long*)pSizePtr) = (2 * n);
         }
 
@@ -271,8 +258,7 @@ RETCODE SQL_API _SQLCopyWCharDataW(pODBCDiag pDiag, void* pTgtDataPtr, Long pDat
     // check if src data but no size holder
     else if (pSrcData) {
         // check if diag to be set
-        if (pDiag)
-        {
+        if (pDiag) {
             _SQLPutDiagRow(pDiag, "_SQLCopyWCharDataW", "01000", -1, "No holder for data size", NULL);
         }
 
@@ -326,12 +312,9 @@ RETCODE SQL_API _SQLCopyWCharDataW(pODBCDiag pDiag, void* pTgtDataPtr, Long pDat
     return SQL_SUCCESS;
 }
 
-
 // ----------------------------------------------------------------------
 // to create a copy of numeric data to specified tgt buffer
 // ----------------------------------------------------------------------
-
-
 //TODO: it seems that the unsigned values are not treated specially
 Word _SQLCopyNumData(pODBCDiag pDiag, void* pTgtDataPtr, Word pTgtDataType, CStrPtr pSrcData, Word pSrcDataType,
     Long* pTgtDataSizePtr) {
@@ -350,214 +333,199 @@ Word _SQLCopyNumData(pODBCDiag pDiag, void* pTgtDataPtr, Word pTgtDataType, CStr
     if (pTgtDataPtr) {
         // check the data type
         switch (pTgtDataType) {
-        case SQL_C_UTINYINT:
-            if (!isnull) {
-                int i32;
-                i32 = atoi(pSrcData);
-                *((unsigned char*)pTgtDataPtr) = i32;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(char));
-            }
-
-            *pTgtDataSizePtr = sizeof(char);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d (unsigned char)",
-                *((unsigned char*)pTgtDataPtr)));
-            break;
-
-        case SQL_C_STINYINT:
-        case SQL_C_TINYINT:
-            if (!isnull) {
-                int i32;
-                i32 = atoi(pSrcData);
-                *((char*)pTgtDataPtr) = i32;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(char));
-            }
-
-            *pTgtDataSizePtr = sizeof(char);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d  (signed char)", *((char*)pTgtDataPtr)));
-            break;
-
-        case SQL_C_USHORT:             // unsigned short
-            if (!isnull) {
-                int i32;
-                i32 = atoi(pSrcData);
-                *((Word*)pTgtDataPtr) = i32;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(Word));
-            }
-
-            *pTgtDataSizePtr = sizeof(Word);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %u (signed short)",
-                *((unsigned short*)pTgtDataPtr)));
-            break;
-
-        case SQL_C_SHORT:             // case i2
-        case SQL_C_SSHORT:             // signed short
-            if (!isnull) {
-                int i32;
-                i32 = atoi(pSrcData);
-                *((Word*)pTgtDataPtr) = i32;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(Word));
-            }
-
-            *pTgtDataSizePtr = sizeof(Word);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d (signed short)", *((Word*)pTgtDataPtr)));
-            break;
-
-        case SQL_C_ULONG:               // unsigned long
-            if (!isnull) {
-                unsigned long ui32;
-                ui32 = strtoul(pSrcData, NULL, 10);
-                *((unsigned long*)pTgtDataPtr) = ui32;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(unsigned long));
-            }
-
-            *pTgtDataSizePtr = sizeof(unsigned long);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %u (unsigned int)",
-                *((unsigned long*)pTgtDataPtr)));
-            break;
-
-        case SQL_C_LONG:               // case i4
-        case SQL_C_SLONG:               // signed long
-
-            // ???? check src type
-            if (!isnull) {
-                long i32;
-                i32 = atol(pSrcData);
-                *((Long*)pTgtDataPtr) = i32;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(Long));
-            }
-
-            *pTgtDataSizePtr = sizeof(Long);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d (signed int)", *((Long*)pTgtDataPtr)));
-            break;
-
-        case SQL_C_UBIGINT:
-            if (!isnull) {
-                unsigned __int64 x64;
-                x64 = _strtoui64(pSrcData, NULL, 10);
-                *((unsigned __int64*)pTgtDataPtr) = x64;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(unsigned __int64));
-            }
-
-            *pTgtDataSizePtr = sizeof(unsigned __int64);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %I64u (unsigned big int)",
-                *((unsigned __int64*)pTgtDataPtr)));
-            break;
-
-        case SQL_BIGINT:
-        case SQL_C_SBIGINT:
-            if (!isnull) {
-                __int64 x64;
-                x64 = _strtoi64(pSrcData, NULL, 10);
-                *((__int64*)pTgtDataPtr) = x64;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(__int64));
-            }
-
-            *pTgtDataSizePtr = sizeof(__int64);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %I64d (signed big int)",
-                *((__int64*)pTgtDataPtr)));
-            break;
-
-            //case SQL_DECIMAL: //decimal type has a special struct
-        case SQL_FLOAT:
-        case SQL_C_FLOAT:
-            if (!isnull) {
-                // ???? check src type
-                double f;
-                f = atof(pSrcData);
-                *((float*)pTgtDataPtr) = (float)f;
-            }
-
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(float));
-            }
-
-            *pTgtDataSizePtr = sizeof(float);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %9.9f (float)", *((float*)pTgtDataPtr)));
-            break;
-
-            //case SQL_REAL:
-            //case SQL_NUMERIC:                           // case float
-
-        case SQL_C_DOUBLE:
-            if (!isnull) {
-                // ???? check src type
-                char*   e;
-                double  d;
-
-                if (pSrcDataType == SQL_BIT)
-                {
-                    d = 1;
+            case SQL_C_UTINYINT:
+                if (!isnull) {
+                    int i32;
+                    i32 = atoi(pSrcData);
+                    *((unsigned char*)pTgtDataPtr) = i32;
                 }
 
-                else
-                {
-                    d = strtod(pSrcData, &e);
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(char));
                 }
 
-                *((double*)pTgtDataPtr) = d;
-            }
+                *pTgtDataSizePtr = sizeof(char);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d (unsigned char)",
+                    *((unsigned char*)pTgtDataPtr)));
+                break;
 
-            else
-            {
-                memset(pTgtDataPtr, 0, sizeof(double));
-            }
+            case SQL_C_STINYINT:
+            case SQL_C_TINYINT:
+                if (!isnull) {
+                    int i32;
+                    i32 = atoi(pSrcData);
+                    *((char*)pTgtDataPtr) = i32;
+                }
 
-            *pTgtDataSizePtr = sizeof(double);
-            __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %9.9f (double), with the pTgtDataSizePtr %d",
-                *((double*)pTgtDataPtr), *pTgtDataSizePtr));
-            break;
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(char));
+                }
 
-        default:
-            return 1;               // data type not understood
+                *pTgtDataSizePtr = sizeof(char);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d  (signed char)", *((char*)pTgtDataPtr)));
+                break;
+
+            case SQL_C_USHORT:             // unsigned short
+                if (!isnull) {
+                    int i32;
+                    i32 = atoi(pSrcData);
+                    *((Word*)pTgtDataPtr) = i32;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(Word));
+                }
+
+                *pTgtDataSizePtr = sizeof(Word);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %u (signed short)",
+                    *((unsigned short*)pTgtDataPtr)));
+                break;
+
+            case SQL_C_SHORT:             // case i2
+            case SQL_C_SSHORT:             // signed short
+                if (!isnull) {
+                    int i32;
+                    i32 = atoi(pSrcData);
+                    *((Word*)pTgtDataPtr) = i32;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(Word));
+                }
+
+                *pTgtDataSizePtr = sizeof(Word);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d (signed short)", *((Word*)pTgtDataPtr)));
+                break;
+
+            case SQL_C_ULONG:               // unsigned long
+                if (!isnull) {
+                    unsigned long ui32;
+                    ui32 = strtoul(pSrcData, NULL, 10);
+                    *((unsigned long*)pTgtDataPtr) = ui32;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(unsigned long));
+                }
+
+                *pTgtDataSizePtr = sizeof(unsigned long);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %u (unsigned int)",
+                    *((unsigned long*)pTgtDataPtr)));
+                break;
+
+            case SQL_C_LONG:               // case i4
+            case SQL_C_SLONG:               // signed long
+
+                // ???? check src type
+                if (!isnull) {
+                    long i32;
+                    i32 = atol(pSrcData);
+                    *((Long*)pTgtDataPtr) = i32;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(Long));
+                }
+
+                *pTgtDataSizePtr = sizeof(Long);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %d (signed int)", *((Long*)pTgtDataPtr)));
+                break;
+
+            case SQL_C_UBIGINT:
+                if (!isnull) {
+                    unsigned __int64 x64;
+                    x64 = _strtoui64(pSrcData, NULL, 10);
+                    *((unsigned __int64*)pTgtDataPtr) = x64;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(unsigned __int64));
+                }
+
+                *pTgtDataSizePtr = sizeof(unsigned __int64);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %I64u (unsigned big int)",
+                    *((unsigned __int64*)pTgtDataPtr)));
+                break;
+
+            case SQL_BIGINT:
+            case SQL_C_SBIGINT:
+                if (!isnull) {
+                    __int64 x64;
+                    x64 = _strtoi64(pSrcData, NULL, 10);
+                    *((__int64*)pTgtDataPtr) = x64;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(__int64));
+                }
+
+                *pTgtDataSizePtr = sizeof(__int64);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %I64d (signed big int)",
+                    *((__int64*)pTgtDataPtr)));
+                break;
+
+                //case SQL_DECIMAL: //decimal type has a special struct
+            case SQL_FLOAT:
+            case SQL_C_FLOAT:
+                if (!isnull) {
+                    // ???? check src type
+                    double f;
+                    f = atof(pSrcData);
+                    *((float*)pTgtDataPtr) = (float)f;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(float));
+                }
+
+                *pTgtDataSizePtr = sizeof(float);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %9.9f (float)", *((float*)pTgtDataPtr)));
+                break;
+
+                //case SQL_REAL:
+                //case SQL_NUMERIC:                           // case float
+
+            case SQL_C_DOUBLE:
+                if (!isnull) {
+                    // ???? check src type
+                    char*   e;
+                    double  d;
+
+                    if (pSrcDataType == SQL_BIT) {
+                        d = 1;
+                    }
+
+                    else {
+                        d = strtod(pSrcData, &e);
+                    }
+
+                    *((double*)pTgtDataPtr) = d;
+                }
+
+                else {
+                    memset(pTgtDataPtr, 0, sizeof(double));
+                }
+
+                *pTgtDataSizePtr = sizeof(double);
+                __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "The num is set to %9.9f (double), with the pTgtDataSizePtr %d",
+                    *((double*)pTgtDataPtr), *pTgtDataSizePtr));
+                break;
+
+            default:
+                return 1;               // data type not understood
         }
 
         return 0;                       // successful, at least data type recognized
     }
 
-    else
-    {
+    else {
         return -1;
     }                      // should not typically happen
 }
 
-
 // ----------------------------------------------------------------------
 // to create a copy of date/time data to specified tgt buffer
 // ----------------------------------------------------------------------
-
 Word _SQLCopyDateTimeData(pODBCDiag pDiag, void* pTgtDataPtr, Word pTgtDataType, CStrPtr pSrcData,
     Word pSrcDataType) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "_SQLCopyDateTimeData called, with the src : %s", pSrcData));
@@ -573,46 +541,42 @@ Word _SQLCopyDateTimeData(pODBCDiag pDiag, void* pTgtDataPtr, Word pTgtDataType,
     if (pTgtDataPtr) {
         // check the data size
         switch (pTgtDataType) {
-        case SQL_C_TYPE_DATE:                     // 91
-        case SQL_C_DATE:
+            case SQL_C_TYPE_DATE:                     // 91
+            case SQL_C_DATE:
 
-            // ???? check src type
-            if (!isnull) {
-                memset(pTgtDataPtr, 0, sizeof(struct tagDATE_STRUCT));
-                GetDateFromString(pSrcData, (struct tagDATE_STRUCT*) pTgtDataPtr);
-            }
+                // ???? check src type
+                if (!isnull) {
+                    memset(pTgtDataPtr, 0, sizeof(struct tagDATE_STRUCT));
+                    GetDateFromString(pSrcData, (struct tagDATE_STRUCT*) pTgtDataPtr);
+                }
 
-            break;
+                break;
 
-        case SQL_C_TYPE_TIME:                     // 92
-        case SQL_C_TIME:
-            //not suppporting Time
-            return 1;
+            case SQL_C_TYPE_TIME:                     // 92
+            case SQL_C_TIME:
+                //not suppporting Time
+                return 1;
 
-        case SQL_C_TYPE_TIMESTAMP:                // 93
-        case SQL_C_TIMESTAMP:
+            case SQL_C_TYPE_TIMESTAMP:                // 93
+            case SQL_C_TIMESTAMP:
 
-            // ???? check src type
-            if (!isnull) {
-                memset(pTgtDataPtr, 0, sizeof(struct tagTIMESTAMP_STRUCT));
-                GetTimestampFromString(pSrcData, (struct tagTIMESTAMP_STRUCT*) pTgtDataPtr);
-            }
+                // ???? check src type
+                if (!isnull) {
+                    memset(pTgtDataPtr, 0, sizeof(struct tagTIMESTAMP_STRUCT));
+                    GetTimestampFromString(pSrcData, (struct tagTIMESTAMP_STRUCT*) pTgtDataPtr);
+                }
 
-            break;
+                break;
 
-        default:
-            return 1;               // data type not understood
+            default:
+                return 1;               // data type not understood
         }
 
         return 0;                       // successful, at least data type recognized
     }
 
-    else
-    {
+    else {
         return -1;
     }                      // should not typically happen
 }
-
-
-
 

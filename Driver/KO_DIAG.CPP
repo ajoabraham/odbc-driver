@@ -47,12 +47,11 @@
 #include <stdarg.h>
 
 // --------------------- local functions ---------------------------------
-static pODBCDiagRow      _SQLGetDiagRowX(pODBCDiag pHandle, Word pRowNum);
-static pODBCDiag         _SQLGetDiagHandle(SQLSMALLINT pHandleType, SQLHANDLE pHandle);
+static pODBCDiagRow _SQLGetDiagRowX(pODBCDiag pHandle, Word pRowNum);
+static pODBCDiag    _SQLGetDiagHandle(SQLSMALLINT pHandleType, SQLHANDLE pHandle);
 
 // --------------------- local functions ---------------------------------
-static LogLevel             currentLogLevel =
-LogLevel_INFO;// Global variable to be set at the begining of pragram starts
+static LogLevel currentLogLevel = LogLevel_INFO; // Global variable to be set at the begining of pragram starts
 
 // -----------------------------------------------------------------------
 // to get a specified field from the specified diag row
@@ -74,8 +73,7 @@ RETCODE SQL_API SQLGetDiagFieldW(SQLSMALLINT     pHandleType,
     pODBCDiagRow diagrow;
     SQLSMALLINT dummySize = 0;//used when pDataSizePtr is NULL
 
-    if (pDataSizePtr == NULL)
-    {
+    if (pDataSizePtr == NULL) {
         pDataSizePtr = &dummySize;
     }
 
@@ -89,77 +87,71 @@ RETCODE SQL_API SQLGetDiagFieldW(SQLSMALLINT     pHandleType,
 
     // check the field type - header fields
     switch (pFldID) {
-    case SQL_DIAG_CURSOR_ROW_COUNT:
-    case SQL_DIAG_ROW_COUNT:                            // rows affected by update/insert
-        if (pHandleType == SQL_HANDLE_STMT) {
-            if (pDataPtr)
-            {
-                *((SQLLEN*)pDataPtr) = (pHandle) ? ((pODBCStmt)pHandle)->RowCount : 0;
+        case SQL_DIAG_CURSOR_ROW_COUNT:
+        case SQL_DIAG_ROW_COUNT:                            // rows affected by update/insert
+            if (pHandleType == SQL_HANDLE_STMT) {
+                if (pDataPtr) {
+                    *((SQLLEN*)pDataPtr) = (pHandle) ? ((pODBCStmt)pHandle)->RowCount : 0;
+                }
+
+                return SQL_SUCCESS;
             }
 
+            else {
+                return SQL_ERROR;
+            }
+
+        case SQL_DIAG_DYNAMIC_FUNCTION:
+            if (pHandleType == SQL_HANDLE_STMT) {
+                _SQLCopyWCharDataW(diag, pDataPtr, pDataSize, pDataSizePtr, 16, ((pODBCStmt)pHandle)->Stmt,
+                    ((pODBCStmt)pHandle)->StmtLen);
+                return SQL_SUCCESS;
+            }
+
+            else {
+                return SQL_ERROR;
+            }
+
+            return SQL_ERROR;
+
+        case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
+            if (pHandleType == SQL_HANDLE_STMT) {
+                if (pDataPtr) {
+                    *((StrPtr)pDataPtr) = 1;
+                }          // ??? debug test only
+
+                _SQLCopyWCharDataW(diag, pDataPtr, pDataSize, pDataSizePtr, 16, ((pODBCStmt)pHandle)->Stmt,
+                    (((pODBCStmt)pHandle)->StmtLen));
+                return SQL_SUCCESS;
+            }
+
+            else {
+                return SQL_ERROR;
+            }
+
+        case SQL_DIAG_NUMBER: {                             // number of rows in diag
+            Word i;
+
+            // check if there r any diag rows
+            if (diag->DiagRows) {
+                // loop to count the rows
+                for (i = 1, diagrow = diag->DiagRows; diagrow != NULL; diagrow = diagrow->Next, i++);
+
+                if (pDataPtr) { *((Word*)pDataPtr) = i; }
+            }
+
+            else if (pDataPtr) { *((Word*)pDataPtr) = 0; }
+
             return SQL_SUCCESS;
         }
+                              break;
 
-        else
-        {
-            return SQL_ERROR;
-        }
-
-    case SQL_DIAG_DYNAMIC_FUNCTION:
-        if (pHandleType == SQL_HANDLE_STMT) {
-            _SQLCopyWCharDataW(diag, pDataPtr, pDataSize, pDataSizePtr, 16, ((pODBCStmt)pHandle)->Stmt,
-                ((pODBCStmt)pHandle)->StmtLen);
-            return SQL_SUCCESS;
-        }
-
-        else
-        {
-            return SQL_ERROR;
-        }
-
-        return SQL_ERROR;
-
-    case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
-        if (pHandleType == SQL_HANDLE_STMT) {
-            if (pDataPtr)
-            {
-                *((StrPtr)pDataPtr) = 1;
-            }          // ??? debug test only
-
-            _SQLCopyWCharDataW(diag, pDataPtr, pDataSize, pDataSizePtr, 16, ((pODBCStmt)pHandle)->Stmt,
-                (((pODBCStmt)pHandle)->StmtLen));
-            return SQL_SUCCESS;
-        }
-
-        else
-        {
-            return SQL_ERROR;
-        }
-
-    case SQL_DIAG_NUMBER: {                             // number of rows in diag
-        Word i;
-
-        // check if there r any diag rows
-        if (diag->DiagRows) {
-            // loop to count the rows
-            for (i = 1, diagrow = diag->DiagRows; diagrow != NULL; diagrow = diagrow->Next, i++);
-
-            if (pDataPtr)  { *((Word*)pDataPtr) = i; }
-        }
-
-        else if (pDataPtr)  { *((Word*)pDataPtr) = 0; }
-
-        return SQL_SUCCESS;
-    }
-                          break;
-
-    default:
-        c = TRUE;
+        default:
+            c = TRUE;
     }
 
     // check if only a header field was required
-    if (c == FALSE)
-    {
+    if (c == FALSE) {
         return SQL_SUCCESS;
     }
 
@@ -170,81 +162,77 @@ RETCODE SQL_API SQLGetDiagFieldW(SQLSMALLINT     pHandleType,
     }
 
     // now get the desired row first
-    if ((diagrow = _SQLGetDiagRowX(diag, pRecNum)) == NULL)
-    {
+    if ((diagrow = _SQLGetDiagRowX(diag, pRecNum)) == NULL) {
         return SQL_NO_DATA;
     }
 
     // now set info as per the field required
     switch (pFldID) {
-    case SQL_DIAG_CLASS_ORIGIN:
-        _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, "ODBC 3.0", -1);
-        break;
+        case SQL_DIAG_CLASS_ORIGIN:
+            _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, "ODBC 3.0", -1);
+            break;
 
-    case SQL_DIAG_COLUMN_NUMBER:
+        case SQL_DIAG_COLUMN_NUMBER:
 
-        // needs to be implemented
-        if (pDataPtr)  { *((Long*)pDataPtr) = diagrow->Col; }
+            // needs to be implemented
+            if (pDataPtr) { *((Long*)pDataPtr) = diagrow->Col; }
 
-        break;
+            break;
 
-    case SQL_DIAG_CONNECTION_NAME:
-        if (pDataPtr)             { *((char*)pDataPtr) = 0; }
+        case SQL_DIAG_CONNECTION_NAME:
+            if (pDataPtr) { *((char*)pDataPtr) = 0; }
 
-        if (pDataSizePtr)         { *pDataSizePtr = 0; }
+            if (pDataSizePtr) { *pDataSizePtr = 0; }
 
-        break;
+            break;
 
-    case SQL_DIAG_MESSAGE_TEXT:
-        return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->Msg, -1);
+        case SQL_DIAG_MESSAGE_TEXT:
+            return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->Msg, -1);
 
-    case SQL_DIAG_NATIVE:
-        if (pDataPtr)             { *((Long*)pDataPtr) = diagrow->NativeErrorCode; }
+        case SQL_DIAG_NATIVE:
+            if (pDataPtr) { *((Long*)pDataPtr) = diagrow->NativeErrorCode; }
 
-        if (pDataSizePtr)         { *pDataSizePtr = 0; }
+            if (pDataSizePtr) { *pDataSizePtr = 0; }
 
-        break;
+            break;
 
-    case SQL_DIAG_ROW_NUMBER:
+        case SQL_DIAG_ROW_NUMBER:
 
-        // needs to be implemented
-        if (pDataPtr)  { *((Long*)pDataPtr) = diagrow->Row; }
+            // needs to be implemented
+            if (pDataPtr) { *((Long*)pDataPtr) = diagrow->Row; }
 
-        break;
+            break;
 
-    case SQL_DIAG_SERVER_NAME: {
-        CStrPtr svr;
+        case SQL_DIAG_SERVER_NAME: {
+            CStrPtr svr;
 
-        // if handle type is connection
-        if (pHandleType == SQL_HANDLE_DBC)
-        {
-            svr = ((pODBCConn)pHandle)->Server;
+            // if handle type is connection
+            if (pHandleType == SQL_HANDLE_DBC) {
+                svr = ((pODBCConn)pHandle)->Server;
+            }
+
+            else if (pHandleType == SQL_HANDLE_STMT && ((pODBCStmt)pHandle)->Conn) {
+                svr = ((pODBCStmt)pHandle)->Conn->Server;
+            }
+
+            else {
+                svr = "";
+            }
+
+            return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, svr, -1);
         }
 
-        else if (pHandleType == SQL_HANDLE_STMT && ((pODBCStmt)pHandle)->Conn)
-        {
-            svr = ((pODBCStmt)pHandle)->Conn->Server;
-        }
+        case SQL_DIAG_SQLSTATE:
+            return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
 
-        else
-        {
-            svr = "";
-        }
+        case SQL_DIAG_SUBCLASS_ORIGIN:
+            // ??? dummy
+            return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
 
-        return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, svr, -1);
-    }
-
-    case SQL_DIAG_SQLSTATE:
-        return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
-
-    case SQL_DIAG_SUBCLASS_ORIGIN:
-        // ??? dummy
-        return _SQLCopyWCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
-
-    default:
-        __ODBCPOPMSG(_ODBCPopMsg("SQLGetDiagField called, HandleType: %d, RecNum: %d, InfoType: %d, BufLen: %d",
-            pHandleType, pRecNum, pFldID, pDataSize));
-        return SQL_ERROR;
+        default:
+            __ODBCPOPMSG(_ODBCPopMsg("SQLGetDiagField called, HandleType: %d, RecNum: %d, InfoType: %d, BufLen: %d",
+                pHandleType, pRecNum, pFldID, pDataSize));
+            return SQL_ERROR;
     }
 
     return SQL_SUCCESS;
@@ -266,8 +254,7 @@ RETCODE SQL_API SQLGetDiagField(SQLSMALLINT     pHandleType,
     pODBCDiagRow diagrow;
     SQLSMALLINT dummySize = 0;//used when pDataSizePtr is NULL
 
-    if (pDataSizePtr == NULL)
-    {
+    if (pDataSizePtr == NULL) {
         pDataSizePtr = &dummySize;
     }
 
@@ -281,77 +268,71 @@ RETCODE SQL_API SQLGetDiagField(SQLSMALLINT     pHandleType,
 
     // check the field type - header fields
     switch (pFldID) {
-    case SQL_DIAG_CURSOR_ROW_COUNT:
-    case SQL_DIAG_ROW_COUNT:                            // rows affected by update/insert
-        if (pHandleType == SQL_HANDLE_STMT) {
-            if (pDataPtr)
-            {
-                *((SQLLEN*)pDataPtr) = (pHandle) ? ((pODBCStmt)pHandle)->RowCount : 0;
+        case SQL_DIAG_CURSOR_ROW_COUNT:
+        case SQL_DIAG_ROW_COUNT:                            // rows affected by update/insert
+            if (pHandleType == SQL_HANDLE_STMT) {
+                if (pDataPtr) {
+                    *((SQLLEN*)pDataPtr) = (pHandle) ? ((pODBCStmt)pHandle)->RowCount : 0;
+                }
+
+                return SQL_SUCCESS;
             }
 
+            else {
+                return SQL_ERROR;
+            }
+
+        case SQL_DIAG_DYNAMIC_FUNCTION:
+            if (pHandleType == SQL_HANDLE_STMT) {
+                unique_ptr<char[]> p(wchar2char(((pODBCStmt)pHandle)->Stmt));
+                _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, p.get(), ((pODBCStmt)pHandle)->StmtLen);
+                return SQL_SUCCESS;
+            }
+
+            else {
+                return SQL_ERROR;
+            }
+
+            return SQL_ERROR;
+
+        case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
+            if (pHandleType == SQL_HANDLE_STMT) {
+                if (pDataPtr) {
+                    *((StrPtr)pDataPtr) = 1;
+                }          // ??? debug test only
+
+                unique_ptr<char[]> p(wchar2char(((pODBCStmt)pHandle)->Stmt));
+                _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, p.get(), (((pODBCStmt)pHandle)->StmtLen));
+                return SQL_SUCCESS;
+            }
+
+            else {
+                return SQL_ERROR;
+            }
+
+        case SQL_DIAG_NUMBER: {                             // number of rows in diag
+            Word i;
+
+            // check if there r any diag rows
+            if (diag->DiagRows) {
+                // loop to count the rows
+                for (i = 1, diagrow = diag->DiagRows; diagrow != NULL; diagrow = diagrow->Next, i++);
+
+                if (pDataPtr) { *((Word*)pDataPtr) = i; }
+            }
+
+            else if (pDataPtr) { *((Word*)pDataPtr) = 0; }
+
             return SQL_SUCCESS;
         }
+                              break;
 
-        else
-        {
-            return SQL_ERROR;
-        }
-
-    case SQL_DIAG_DYNAMIC_FUNCTION:
-        if (pHandleType == SQL_HANDLE_STMT) {
-            unique_ptr<char[]> p(wchar2char(((pODBCStmt)pHandle)->Stmt));
-            _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, p.get(), ((pODBCStmt)pHandle)->StmtLen);
-            return SQL_SUCCESS;
-        }
-
-        else
-        {
-            return SQL_ERROR;
-        }
-
-        return SQL_ERROR;
-
-    case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
-        if (pHandleType == SQL_HANDLE_STMT) {
-            if (pDataPtr)
-            {
-                *((StrPtr)pDataPtr) = 1;
-            }          // ??? debug test only
-
-            unique_ptr<char[]> p(wchar2char(((pODBCStmt)pHandle)->Stmt));
-            _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, p.get(), (((pODBCStmt)pHandle)->StmtLen));
-            return SQL_SUCCESS;
-        }
-
-        else
-        {
-            return SQL_ERROR;
-        }
-
-    case SQL_DIAG_NUMBER: {                             // number of rows in diag
-        Word i;
-
-        // check if there r any diag rows
-        if (diag->DiagRows) {
-            // loop to count the rows
-            for (i = 1, diagrow = diag->DiagRows; diagrow != NULL; diagrow = diagrow->Next, i++);
-
-            if (pDataPtr)  { *((Word*)pDataPtr) = i; }
-        }
-
-        else if (pDataPtr)  { *((Word*)pDataPtr) = 0; }
-
-        return SQL_SUCCESS;
-    }
-                          break;
-
-    default:
-        c = TRUE;
+        default:
+            c = TRUE;
     }
 
     // check if only a header field was required
-    if (c == FALSE)
-    {
+    if (c == FALSE) {
         return SQL_SUCCESS;
     }
 
@@ -362,81 +343,77 @@ RETCODE SQL_API SQLGetDiagField(SQLSMALLINT     pHandleType,
     }
 
     // now get the desired row first
-    if ((diagrow = _SQLGetDiagRowX(diag, pRecNum)) == NULL)
-    {
+    if ((diagrow = _SQLGetDiagRowX(diag, pRecNum)) == NULL) {
         return SQL_NO_DATA;
     }
 
     // now set info as per the field required
     switch (pFldID) {
-    case SQL_DIAG_CLASS_ORIGIN:
-        _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, "ODBC 3.0", -1);
-        break;
+        case SQL_DIAG_CLASS_ORIGIN:
+            _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, "ODBC 3.0", -1);
+            break;
 
-    case SQL_DIAG_COLUMN_NUMBER:
+        case SQL_DIAG_COLUMN_NUMBER:
 
-        // needs to be implemented
-        if (pDataPtr)  { *((Long*)pDataPtr) = diagrow->Col; }
+            // needs to be implemented
+            if (pDataPtr) { *((Long*)pDataPtr) = diagrow->Col; }
 
-        break;
+            break;
 
-    case SQL_DIAG_CONNECTION_NAME:
-        if (pDataPtr)             { *((char*)pDataPtr) = 0; }
+        case SQL_DIAG_CONNECTION_NAME:
+            if (pDataPtr) { *((char*)pDataPtr) = 0; }
 
-        if (pDataSizePtr)         { *pDataSizePtr = 0; }
+            if (pDataSizePtr) { *pDataSizePtr = 0; }
 
-        break;
+            break;
 
-    case SQL_DIAG_MESSAGE_TEXT:
-        return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->Msg, -1);
+        case SQL_DIAG_MESSAGE_TEXT:
+            return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->Msg, -1);
 
-    case SQL_DIAG_NATIVE:
-        if (pDataPtr)             { *((Long*)pDataPtr) = diagrow->NativeErrorCode; }
+        case SQL_DIAG_NATIVE:
+            if (pDataPtr) { *((Long*)pDataPtr) = diagrow->NativeErrorCode; }
 
-        if (pDataSizePtr)         { *pDataSizePtr = 0; }
+            if (pDataSizePtr) { *pDataSizePtr = 0; }
 
-        break;
+            break;
 
-    case SQL_DIAG_ROW_NUMBER:
+        case SQL_DIAG_ROW_NUMBER:
 
-        // needs to be implemented
-        if (pDataPtr)  { *((Long*)pDataPtr) = diagrow->Row; }
+            // needs to be implemented
+            if (pDataPtr) { *((Long*)pDataPtr) = diagrow->Row; }
 
-        break;
+            break;
 
-    case SQL_DIAG_SERVER_NAME: {
-        CStrPtr svr;
+        case SQL_DIAG_SERVER_NAME: {
+            CStrPtr svr;
 
-        // if handle type is connection
-        if (pHandleType == SQL_HANDLE_DBC)
-        {
-            svr = ((pODBCConn)pHandle)->Server;
+            // if handle type is connection
+            if (pHandleType == SQL_HANDLE_DBC) {
+                svr = ((pODBCConn)pHandle)->Server;
+            }
+
+            else if (pHandleType == SQL_HANDLE_STMT && ((pODBCStmt)pHandle)->Conn) {
+                svr = ((pODBCStmt)pHandle)->Conn->Server;
+            }
+
+            else {
+                svr = "";
+            }
+
+            return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, svr, -1);
         }
 
-        else if (pHandleType == SQL_HANDLE_STMT && ((pODBCStmt)pHandle)->Conn)
-        {
-            svr = ((pODBCStmt)pHandle)->Conn->Server;
-        }
+        case SQL_DIAG_SQLSTATE:
+            return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
 
-        else
-        {
-            svr = "";
-        }
+        case SQL_DIAG_SUBCLASS_ORIGIN:
+            // ??? dummy
+            return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
 
-        return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, svr, -1);
-    }
-
-    case SQL_DIAG_SQLSTATE:
-        return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
-
-    case SQL_DIAG_SUBCLASS_ORIGIN:
-        // ??? dummy
-        return _SQLCopyCharData(diag, pDataPtr, pDataSize, pDataSizePtr, 16, diagrow->State, -1);
-
-    default:
-        __ODBCPOPMSG(_ODBCPopMsg("SQLGetDiagField called, HandleType: %d, RecNum: %d, InfoType: %d, BufLen: %d",
-            pHandleType, pRecNum, pFldID, pDataSize));
-        return SQL_ERROR;
+        default:
+            __ODBCPOPMSG(_ODBCPopMsg("SQLGetDiagField called, HandleType: %d, RecNum: %d, InfoType: %d, BufLen: %d",
+                pHandleType, pRecNum, pFldID, pDataSize));
+            return SQL_ERROR;
     }
 
     return SQL_SUCCESS;
@@ -471,8 +448,7 @@ RETCODE SQL_API SQLGetDiagRecW(SQLSMALLINT     pHandleType,
     }
 
     // native error code
-    if (pNativeErrorPtr)
-    {
+    if (pNativeErrorPtr) {
         (*pNativeErrorPtr) = diagrow->NativeErrorCode;
     }
 
@@ -510,20 +486,17 @@ RETCODE SQL_API SQLGetDiagRec(SQLSMALLINT     pHandleType,
     if (!diag) { return SQL_ERROR; }
 
     // now get the desired diag row
-    if ((diagrow = _SQLGetDiagRowX(diag, pRecNum)) == NULL)
-    {
+    if ((diagrow = _SQLGetDiagRowX(diag, pRecNum)) == NULL) {
         return SQL_NO_DATA;
     }
 
     // sql-state
-    if (pSqlstate)
-    {
+    if (pSqlstate) {
         strcpy((char*)pSqlstate, diagrow->State);
     }
 
     // native error code
-    if (pNativeErrorPtr)
-    {
+    if (pNativeErrorPtr) {
         (*pNativeErrorPtr) = diagrow->NativeErrorCode;
     }
 
@@ -545,8 +518,7 @@ pODBCDiagRow _SQLPutDiagRow(pODBCDiag pDiag, StrPtr pFunc, StrPtr pState, Long p
     pODBCDiagRow     r;
 
     // first set the value of source function, assuming less than 64
-    if (pFunc)
-    {
+    if (pFunc) {
         strcpy(pDiag->Func, pFunc);
     }
 
@@ -554,13 +526,11 @@ pODBCDiagRow _SQLPutDiagRow(pODBCDiag pDiag, StrPtr pFunc, StrPtr pState, Long p
     strcpy(s, "[Kylin][ODBC 1.0(w) Driver]");
 
     // check if there is some message
-    if (pMsgArgs)
-    {
+    if (pMsgArgs) {
         vsprintf(s + strlen(s), pMsgArgs, pArgs);
     }
 
-    else
-    {
+    else {
         strcat(s, "(unknown)");
     }
 
@@ -570,7 +540,7 @@ pODBCDiagRow _SQLPutDiagRow(pODBCDiag pDiag, StrPtr pFunc, StrPtr pState, Long p
     memset(r, 0, sizeof(ODBCDiagRow));
 
     // set the values for state and native error code
-    if (pState)       { strncpy(r->State, pState, SQL_SQLSTATE_SIZE); }
+    if (pState) { strncpy(r->State, pState, SQL_SQLSTATE_SIZE); }
 
     r->NativeErrorCode = pNativeErrorCode;
     // allocate space for message
@@ -616,8 +586,7 @@ eGoodBad _SQLPutDiagRow(SQLSMALLINT pHandleType, SQLHANDLE pHandle, StrPtr pFunc
     __CHK_HANDLE(pHandle, pHandleType, BAD);
     diag = _SQLGetDiagHandle(pHandleType, pHandle);
 
-    if (!diag)
-    {
+    if (!diag) {
         return BAD;
     }
 
@@ -643,8 +612,7 @@ eGoodBad _SQLPutDiagRow(SQLSMALLINT pHandleType, SQLHANDLE pHandle, StrPtr pFunc
     __CHK_HANDLE(pHandle, pHandleType, BAD);
     diag = _SQLGetDiagHandle(pHandleType, pHandle);
 
-    if (!diag)
-    {
+    if (!diag) {
         return BAD;
     }
 
@@ -675,8 +643,7 @@ eGoodBad _SQLFreeDiag(pODBCDiag pHandle) {
         t = pHandle->DiagRows;
         pHandle->DiagRows = t->Next;
 
-        if (pHandle->DiagRows)
-        {
+        if (pHandle->DiagRows) {
             (pHandle->DiagRows)->Prev = NULL;
         }
 
@@ -706,18 +673,18 @@ eGoodBad _SQLFreeDiag(pODBCDiag pHandle) {
 static pODBCDiag _SQLGetDiagHandle(SQLSMALLINT pHandleType, SQLHANDLE pHandle) {
     // first extract the diag details
     switch (pHandleType) {
-    case SQL_HANDLE_ENV:
-        return &(((pODBCEnv)pHandle)->Diag);
+        case SQL_HANDLE_ENV:
+            return &(((pODBCEnv)pHandle)->Diag);
 
-    case SQL_HANDLE_DBC:
-        return &(((pODBCConn)pHandle)->Diag);
+        case SQL_HANDLE_DBC:
+            return &(((pODBCConn)pHandle)->Diag);
 
-    case SQL_HANDLE_STMT:
-        return &(((pODBCStmt)pHandle)->Diag);
+        case SQL_HANDLE_STMT:
+            return &(((pODBCStmt)pHandle)->Diag);
 
-    default:
-        __ODBCPOPMSG(_ODBCPopMsg("SQLGetDiagRec was called with desciptor handle"));
-        return NULL;                   // ??? support for desc diag not available now
+        default:
+            __ODBCPOPMSG(_ODBCPopMsg("SQLGetDiagRec was called with desciptor handle"));
+            return NULL;                   // ??? support for desc diag not available now
     }
 }
 
@@ -753,8 +720,7 @@ void _ODBCPopMsg(const char* pMsgArgs, ...) {
         va_end(args);
     }
 
-    else
-    {
+    else {
         s[0] = 0;
     }
 
@@ -781,8 +747,7 @@ void __ODBCPopMsg(const char* pMsgArgs, ...) {
         va_end(args);
     }
 
-    else
-    {
+    else {
         s[0] = 0;
     }
 
@@ -849,8 +814,7 @@ void _ODBCLogStart(void) {
         strftime(buffer, 100, "%Y-%m-%d.%X", &tstruct);
 
         for (unsigned int i = 0; i < strlen(buffer); i++) {
-            if (buffer[i] == '.' || buffer[i] == ':')
-            {
+            if (buffer[i] == '.' || buffer[i] == ':') {
                 buffer[i] = '-';
             }
         }
@@ -883,8 +847,7 @@ void _ODBCLogStart(void) {
     }
 
     // check if file opened succesfully
-    if (gLogFile != -1)
-    {
+    if (gLogFile != -1) {
         ++gLogUsage;
     }               // increment log usage
 
@@ -943,28 +906,28 @@ void _ODBCLogMsg(LogLevel level, const char* pMsgArgs, ...) {
     // check if there is a log file
     if (gLogFile != -1) {
         switch (level) {
-        case LogLevel_DEBUG:
-            _write(gLogFile, "[DEBUG]", 7);
-            break;
+            case LogLevel_DEBUG:
+                _write(gLogFile, "[DEBUG]", 7);
+                break;
 
-        case LogLevel_INFO:
-            _write(gLogFile, "[INFO ]", 7);
-            break;
+            case LogLevel_INFO:
+                _write(gLogFile, "[INFO ]", 7);
+                break;
 
-        case LogLevel_WARN:
-            _write(gLogFile, "[WARN ]", 7);
-            break;
+            case LogLevel_WARN:
+                _write(gLogFile, "[WARN ]", 7);
+                break;
 
-        case LogLevel_ERROR:
-            _write(gLogFile, "[ERROR]", 7);
-            break;
+            case LogLevel_ERROR:
+                _write(gLogFile, "[ERROR]", 7);
+                break;
 
-        case LogLevel_FATAL:
-            _write(gLogFile, "[FATAL]", 7);
-            break;
+            case LogLevel_FATAL:
+                _write(gLogFile, "[FATAL]", 7);
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
 
         time_t     now = time(0);
@@ -986,8 +949,7 @@ void _ODBCLogMsg(LogLevel level, const char* pMsgArgs, ...) {
             va_end(args);
         }
 
-        else
-        {
+        else {
             s[0] = 0;
         }
 
@@ -996,9 +958,4 @@ void _ODBCLogMsg(LogLevel level, const char* pMsgArgs, ...) {
         _write(gLogFile, "\n", 1);
     }
 }
-
-
-
-
-
 

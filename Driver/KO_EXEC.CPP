@@ -46,11 +46,9 @@
 static eGoodBad ProcessStmtForParams(pODBCStmt pStmt, const wchar_t* pStmtText, Long pTextLength,
     wchar_t*& s);
 
-
 // -----------------------------------------------------------------------
 // to convert a stmt to an SZ string plus include param values
 // -----------------------------------------------------------------------
-
 static eGoodBad ProcessStmtForParams(pODBCStmt pStmt, const wchar_t* pStmtText, Long pTextLength, wchar_t* & s) {
     // note
     // since the param feature has not yet been implemented
@@ -59,8 +57,7 @@ static eGoodBad ProcessStmtForParams(pODBCStmt pStmt, const wchar_t* pStmtText, 
     Long t = 0;
 
     // calc stmt length
-    if (pStmtText)
-    {
+    if (pStmtText) {
         t = (pTextLength > 0) ? pTextLength : (Long)wcslen(pStmtText);
     }
 
@@ -76,7 +73,6 @@ static eGoodBad ProcessStmtForParams(pODBCStmt pStmt, const wchar_t* pStmtText, 
 // -----------------------------------------------------------------------
 // to finalize a response to stmt structure
 // -----------------------------------------------------------------------
-
 eGoodBad PutRespToStmt(pODBCStmt pStmt, std::unique_ptr<SQLResponse> resp) {
     // check the response type
     if (true) {
@@ -96,7 +92,6 @@ eGoodBad PutRespToStmt(pODBCStmt pStmt, std::unique_ptr<SQLResponse> resp) {
 // -----------------------------------------------------------------------
 // to execute a statement given in form of rest query
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API _SQLExecStmtFromReq(pODBCStmt pStmt, bool pPrepared) {
     ////// this part should not be required if already prepared
     // release existing stmt contents
@@ -130,13 +125,9 @@ RETCODE SQL_API _SQLExecStmtFromReq(pODBCStmt pStmt, bool pPrepared) {
     return SQL_SUCCESS;
 }
 
-
-
-
 // -----------------------------------------------------------------------
 // to prepare a sql statement for executing
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLPrepare(SQLHSTMT    pStmt,
     SQLCHAR*    pStmtText,
     SQLINTEGER  pTextLength) {
@@ -166,8 +157,7 @@ RETCODE SQL_API SQLPrepareW(SQLHSTMT    pStmt,
     // MANAGE STMT CONTENT
 
     // convert to full request, with zero termination ( as well as params - later )
-    if (ProcessStmtForParams((pODBCStmt)pStmt, pStmtText, pTextLength, s) == BAD)
-    {
+    if (ProcessStmtForParams((pODBCStmt)pStmt, pStmtText, pTextLength, s) == BAD) {
         return SQL_ERROR;
     }
 
@@ -184,11 +174,9 @@ RETCODE SQL_API SQLPrepareW(SQLHSTMT    pStmt,
     return SQL_SUCCESS;
 }
 
-
 // -----------------------------------------------------------------------
 // to execute a prepared statement
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLExecute(HSTMT pStmt) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLExecute called on: %d", pStmt));
     Word        x;
@@ -209,7 +197,6 @@ RETCODE SQL_API SQLExecute(HSTMT pStmt) {
 // -----------------------------------------------------------------------
 // to execute a sql statement directly
 // -----------------------------------------------------------------------
-
 RETCODE SQL_API SQLExecDirect(SQLHSTMT    pStmt,
     SQLCHAR*    pStmtText,
     SQLINTEGER  pTextLength) {
@@ -235,8 +222,7 @@ RETCODE SQL_API SQLExecDirectW(SQLHSTMT    pStmt,
     }
 
     // convert to full request, with zero termination ( as well as params - later )
-    if (ProcessStmtForParams((pODBCStmt)pStmt, (wchar_t*)pStmtText, pTextLength, s) == BAD)
-    {
+    if (ProcessStmtForParams((pODBCStmt)pStmt, (wchar_t*)pStmtText, pTextLength, s) == BAD) {
         return SQL_ERROR;
     }
 
@@ -256,7 +242,6 @@ RETCODE SQL_API SQLExecDirectW(SQLHSTMT    pStmt,
 // ----------------------------------------------------------------------
 // to cancel any asynchronous processing, or pending data request
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API SQLCancel(HSTMT pStmt) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "SQLCancel called"));
     //if ( pStmt )
@@ -265,11 +250,9 @@ RETCODE SQL_API SQLCancel(HSTMT pStmt) {
     return SQL_SUCCESS;
 }
 
-
 // ----------------------------------------------------------------------
 // to commit/rollback all stmts on connection or connections on env
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API SQLEndTran(SQLSMALLINT     pHandleType,
     SQLHANDLE       pHandle,
     SQLSMALLINT     pCompletionType) {
@@ -281,7 +264,6 @@ RETCODE SQL_API SQLEndTran(SQLSMALLINT     pHandleType,
 // ----------------------------------------------------------------------
 // to set cursor position in a rowset, allows an appl to refresh/update/delete data in rowset
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API SQLSetPos(SQLHSTMT        pStmt,
     SQLUSMALLINT    pRowNumber,
     SQLUSMALLINT    pOperation,
@@ -294,7 +276,6 @@ RETCODE SQL_API SQLSetPos(SQLHSTMT        pStmt,
 // ----------------------------------------------------------------------
 // to close a cursor that has been opened on a statement and discards pending results.
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API SQLCloseCursor(SQLHSTMT pStmt) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLCloseCursor called"));
     __CHK_HANDLE(pStmt, SQL_HANDLE_STMT, SQL_ERROR);
@@ -317,10 +298,10 @@ RETCODE SQL_API SQLCloseCursor(SQLHSTMT pStmt) {
 // ----------------------------------------------------------------------
 // to perform bulk insertions & bulk bookmark operations, like update, delete & fetch by bookmark.
 // ----------------------------------------------------------------------
-
 RETCODE SQL_API SQLBulkOperations(SQLHSTMT        pStmt,
     SQLUSMALLINT    pOperation) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "SQLBulkOperations called\n"));
     __ODBCPOPMSG(_ODBCPopMsg("SQLBulkOperations not implemented"));
     return SQL_ERROR;
 }
+

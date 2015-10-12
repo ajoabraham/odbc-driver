@@ -82,38 +82,37 @@ static eGoodBad LoadODBCINIDataToDlgDSNCfg2(HWND hDlg) {
     // DSN name
     x = SetDlgItemText(hDlg, IDC_DSNNAME, currentDSN);
 
-    if (!x)  { return BAD; }
+    if (!x) { return BAD; }
 
     // server name/IP
     GetValueFromODBCINI(currentDSN, SERVERKEY, "", buffer, BUFFERSIZE, INITFILE);
     x = SetDlgItemText(hDlg, IDC_SERVER, buffer);
 
-    if (!x)  { return BAD; }
+    if (!x) { return BAD; }
 
     // server port
     GetValueFromODBCINI(currentDSN, PORTKEY, "443", buffer, BUFFERSIZE, INITFILE);
     int portTemp = atoi(buffer);
 
-    if (portTemp == 0)
-    {
+    if (portTemp == 0) {
         portTemp = 443;
     }
 
     x = SetDlgItemInt(hDlg, IDC_PORT, portTemp, FALSE);
 
-    if (!x)  { return BAD; }
+    if (!x) { return BAD; }
 
     // user name
     GetValueFromODBCINI(currentDSN, UIDKEY, "", buffer, BUFFERSIZE, INITFILE);
     x = SetDlgItemText(hDlg, IDC_UID, buffer);
 
-    if (!x)  { return BAD; }
+    if (!x) { return BAD; }
 
     // password
     GetValueFromODBCINI(currentDSN, PWDKEY, "", buffer, BUFFERSIZE, INITFILE);
     x = SetDlgItemText(hDlg, IDC_PWD, buffer);
 
-    if (!x)  { return BAD; }
+    if (!x) { return BAD; }
 
     return GOOD;
 }
@@ -472,7 +471,6 @@ static eGoodBad RetriveDlgDataToODBCINI(HWND hDlg, bool onlyTest) {
     return GOOD;
 }
 
-
 eGoodBad  LoadODBCINIDataToConn(pODBCConn pConn) {
     Long    x;
     char buffer[BUFFERSIZE];
@@ -552,103 +550,100 @@ INT_PTR CALLBACK DlgDSNCfg2Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
     char        pwdStr[BUFFERSIZE];
 
     switch (uMsg) {
-    case WM_INITDIALOG:
-        SetCurrentDSN(attributes, "DlgDSNCfg2Proc");
-        // store the structure for future use
-        SetWindowLongPtr(hDlg, DWLP_USER, lParam);
+        case WM_INITDIALOG:
+            SetCurrentDSN(attributes, "DlgDSNCfg2Proc");
+            // store the structure for future use
+            SetWindowLongPtr(hDlg, DWLP_USER, lParam);
 
-        // initialize the dialog with data from REGEDIT
-        if (LoadODBCINIDataToDlgDSNCfg2(hDlg) != GOOD)
-        {
-            return false;
-        }
+            // initialize the dialog with data from REGEDIT
+            if (LoadODBCINIDataToDlgDSNCfg2(hDlg) != GOOD) {
+                return false;
+            }
 
-        // set focus automatically
-        return TRUE;
+            // set focus automatically
+            return TRUE;
 
-    case WM_COMMAND:
-        switch (LOWORD(wParam)) {
-        case IDC_BTEST: {
-            if (RetriveDlgData(hDlg, newDSN, serverStr, uidStr, pwdStr, &port) == GOOD) {
-                if (testConnection(serverStr, uidStr, pwdStr, port) == GOOD) {
-                    HWND hwndCombo = GetDlgItem(hDlg, IDC_COMBO1);
-                    HWND hwndOK = GetDlgItem(hDlg, IDOK);
-                    //passed verification
-                    EnableWindow(hwndCombo, TRUE);
+        case WM_COMMAND:
+            switch (LOWORD(wParam)) {
+                case IDC_BTEST: {
+                    if (RetriveDlgData(hDlg, newDSN, serverStr, uidStr, pwdStr, &port) == GOOD) {
+                        if (testConnection(serverStr, uidStr, pwdStr, port) == GOOD) {
+                            HWND hwndCombo = GetDlgItem(hDlg, IDC_COMBO1);
+                            HWND hwndOK = GetDlgItem(hDlg, IDOK);
+                            //passed verification
+                            EnableWindow(hwndCombo, TRUE);
 
-                    try {
-                        projectMap.clear();
-                        restListProjects(serverStr, port, uidStr, pwdStr, projectMap);
+                            try {
+                                projectMap.clear();
+                                restListProjects(serverStr, port, uidStr, pwdStr, projectMap);
 
-                        for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
-                            SendMessage(hwndCombo, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(*i).first.c_str());
+                                for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
+                                    SendMessage(hwndCombo, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(*i).first.c_str());
+                                }
+
+                                SendMessage(hwndCombo, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+                            }
+
+                            catch (exception& e) {
+                                stringstream ss;
+                                ss << "Getting project list failed with error: " << e.what();
+                                __ODBCPopMsg(ss.str().c_str());
+                                return FALSE;
+                            }
+
+                            EnableWindow(hwndOK, TRUE);
+                            return TRUE;
                         }
 
-                        SendMessage(hwndCombo, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+                        else {
+                            __ODBCPopMsg("testConnection failed.");
+                        }
                     }
 
-                    catch (exception& e) {
-                        stringstream ss;
-                        ss << "Getting project list failed with error: " << e.what();
-                        __ODBCPopMsg(ss.str().c_str());
-                        return FALSE;
+                    else {
+                        __ODBCPopMsg("RetriveDlgData failed.");
                     }
 
-                    EnableWindow(hwndOK, TRUE);
-                    return TRUE;
+                    return FALSE;
                 }
 
-                else {
-                    __ODBCPopMsg("testConnection failed.");
-                }
-            }
+                case IDOK: {
+                    HWND hwndCombo = GetDlgItem(hDlg, IDC_COMBO1);
+                    int ItemIndex = SendMessage((HWND)hwndCombo, (UINT)CB_GETCURSEL,
+                        (WPARAM)0, (LPARAM)0);
+                    TCHAR  projectName[256];
+                    (TCHAR)SendMessage((HWND)hwndCombo, (UINT)CB_GETLBTEXT,
+                        (WPARAM)ItemIndex, (LPARAM)projectName);
 
-            else {
-                __ODBCPopMsg("RetriveDlgData failed.");
-            }
+                    if (RetriveDlgData(hDlg, newDSN, serverStr, uidStr, pwdStr, &port) == GOOD) {
+                        auto find = projectMap.find(std::string(projectName));
+                        std::string projectSlug;
 
-            return FALSE;
-        }
+                        if (find != projectMap.end()) {
+                            projectSlug = projectMap.at(std::string(projectName));
+                        } else {
+                            projectSlug = projectName;
+                        }
 
-        case IDOK: {
-            HWND hwndCombo = GetDlgItem(hDlg, IDC_COMBO1);
-            int ItemIndex = SendMessage((HWND)hwndCombo, (UINT)CB_GETCURSEL,
-                (WPARAM)0, (LPARAM)0);
-            TCHAR  projectName[256];
-            (TCHAR)SendMessage((HWND)hwndCombo, (UINT)CB_GETLBTEXT,
-                (WPARAM)ItemIndex, (LPARAM)projectName);
+                        if (testGetMetadata(serverStr, uidStr, pwdStr, port, projectSlug.c_str()) == GOOD) {
+                            SaveConfigToODBCINI(newDSN, serverStr, uidStr, pwdStr, port, projectName);
+                            EndDialog(hDlg, wParam);
+                            return TRUE;
+                        }
+                    }
 
-            if (RetriveDlgData(hDlg, newDSN, serverStr, uidStr, pwdStr, &port) == GOOD) {
-                auto find = projectMap.find(std::string(projectName));
-                std::string projectSlug;
-
-                if (find != projectMap.end()) {
-                    projectSlug = projectMap.at(std::string(projectName));
-                }
-                else {
-                    projectSlug = projectName;
+                    return FALSE;
                 }
 
-                if (testGetMetadata(serverStr, uidStr, pwdStr, port, projectSlug.c_str()) == GOOD) {
-                    SaveConfigToODBCINI(newDSN, serverStr, uidStr, pwdStr, port, projectName);
+                case IDCANCEL:
+                    // indicate end with control id as return value
                     EndDialog(hDlg, wParam);
                     return TRUE;
-                }
             }
-
-            return FALSE;
-        }
-
-        case IDCANCEL:
-            // indicate end with control id as return value
-            EndDialog(hDlg, wParam);
-            return TRUE;
-        }
     }
 
     return FALSE;
 }
-
 
 BOOL INSTAPI ConfigDSN(HWND    hwndParent, WORD    fRequest, LPCSTR  lpszDriver, LPCSTR  lpszAttributes) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "ConfigDSN %s is called %s, the fRequest is: %d", lpszDriver, lpszAttributes,
@@ -679,16 +674,15 @@ BOOL INSTAPI ConfigDSN(HWND    hwndParent, WORD    fRequest, LPCSTR  lpszDriver,
 
     // check status
     switch (i) {
-    case IDOK:
-        __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "User click OK button on DSN config"));
-        return true;           // complete
+        case IDOK:
+            __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "User click OK button on DSN config"));
+            return true;           // complete
 
-    default:
-        __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "User click Cancel button on DSN config"));
-        return false;           // user-cancelled
+        default:
+            __ODBCLOG(_ODBCLogMsg(LogLevel_INFO, "User click Cancel button on DSN config"));
+            return false;           // user-cancelled
     }
 
     return true;
 }
-
 

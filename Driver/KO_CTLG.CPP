@@ -339,4 +339,3 @@ RETCODE SQL_API SQLProcedureColumns(SQLHSTMT        pStmt,
     return SQL_ERROR;
 }
 
-
