@@ -84,7 +84,8 @@ SQLRowContent* GetIfExist(std::vector<SQLRowContent*>& container, int index);
 // -----------------------------------------------------------------------
 
 
-RETCODE  _SQLColAttribute_basic(SQLHSTMT        pStmt,
+RETCODE  _SQLColAttribute_basic(
+    SQLHSTMT pStmt,
     SQLUSMALLINT    pColNum,
     SQLUSMALLINT    pFldID,
     SQLPOINTER      pDataPtr,
@@ -251,7 +252,8 @@ RETCODE SQL_API SQLColAttributeW(SQLHSTMT        pStmt,
     return code;
 }
 
-RETCODE SQL_API SQLColAttribute(SQLHSTMT        pStmt,
+RETCODE SQL_API SQLColAttribute(
+    SQLHSTMT        pStmt,
     SQLUSMALLINT    pColNum,
     SQLUSMALLINT    pFldID,
     SQLPOINTER      pDataPtr,
