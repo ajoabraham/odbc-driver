@@ -6,7 +6,7 @@
 
 TableMeta* TableMetaFromJSON(web::json::value & object) {
 	TableMeta* result = new TableMeta();
-#if defined(_KYLIN_REST_SERVICE)
+
 	x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, object[U("table_CAT")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, object[U("table_SCHEM")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, object[U("table_NAME")], as_string());
@@ -17,13 +17,7 @@ TableMeta* TableMetaFromJSON(web::json::value & object) {
 	x_ASSIGN_IF_NOT_NULL(result->TYPE_NAME, object[U("type_NAME")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->SELF_REFERENCING_COL_NAME, object[U("self_REFERENCING_COL_NAME")], as_string());
 	x_ASSIGN_IF_NOT_NULL(result->REF_GENERATION, object[U("ref_GENERATION")], as_string());
-#else
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, object[U("catalogName")], as_string()); // vero doesn't have this
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, object[U("schemaName")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, object[U("name")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->TABLE_TYPE, object[U("tableType")], as_string());
-	x_ASSIGN_IF_NOT_NULL(result->REMARKS, object[U("description")], as_string());
-#endif
+
 	return result;
 }
 
@@ -32,7 +26,7 @@ ColumnMeta* ColumnMetaFromJSON(
     web::json::value &column_object,
     unsigned int count) {
 	ColumnMeta* result = new ColumnMeta();
-#if defined(_KYLIN_REST_SERVICE)
+
     x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, column_object[U("table_CAT")], as_string());
     x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, column_object[U("table_SCHEM")], as_string());
     x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, column_object[U("table_NAME")], as_string());
@@ -61,7 +55,6 @@ ColumnMeta* ColumnMetaFromJSON(
 	}
 
 	// the orig value passed from REST is java.sql.Types, we convert it to SQL Type
-
     if (!column_object[U("data_TYPE")].is_null()) {
         result->DATA_TYPE = JDBC2ODBC(column_object[U("data_TYPE")].as_integer());
 	}
@@ -69,44 +62,6 @@ ColumnMeta* ColumnMetaFromJSON(
     if (!column_object[U("sql_DATA_TYPE")].is_null()) {
         result->SQL_DATA_TYPE = JDBC2ODBC(column_object[U("sql_DATA_TYPE")].as_integer());
 	}
-#else
-    x_ASSIGN_IF_NOT_NULL(result->TABLE_CAT, table_object[U("catalogName")], as_string()); // vero doesn't have this
-    x_ASSIGN_IF_NOT_NULL(result->TABLE_SCHEM, table_object[U("schemaName")], as_string());
-    x_ASSIGN_IF_NOT_NULL(result->TABLE_NAME, table_object[U("name")], as_string());
-    x_ASSIGN_IF_NOT_NULL(result->COLUMN_NAME, column_object[U("name")], as_string()); // 4
-    ASSIGN_IF_NOT_NULL(result->DATA_TYPE ,column_object[U("data_TYPE")], as_integer()); // TODO: yulinwen, vero doesn't have this
-    x_ASSIGN_IF_NOT_NULL(result->TYPE_NAME, column_object[U("dataType")], as_string()); // 6
-    ASSIGN_IF_NOT_NULL(result->COLUMN_SIZE, column_object[U("dataTypeLength")], as_integer());
-    ASSIGN_IF_NOT_NULL(result->BUFFER_LENGTH, column_object[U("dataTypeLength")], as_integer()); // 8
-    ASSIGN_IF_NOT_NULL(result->DECIMAL_DIGITS, column_object[U("decimal_DIGITS")], as_integer()); // vero doesn't have this
-    ASSIGN_IF_NOT_NULL(result->NUM_PREC_RADIX, column_object[U("num_PREC_RADIX")], as_integer()); // vero doesn't have this
-    ASSIGN_IF_NOT_NULL(result->NULLABLE, column_object[U("nullable")], as_integer());
-    x_ASSIGN_IF_NOT_NULL(result->REMARKS, column_object[U("description")], as_string());
-    x_ASSIGN_IF_NOT_NULL(result->COLUMN_DEF, column_object[U("column_DEF")], as_string()); // 13, vero doesn't have this
-    ASSIGN_IF_NOT_NULL(result->SQL_DATA_TYPE ,column_object[U("sql_DATA_TYPE")], as_integer()); // TODO: yulinwen, vero doesn't have this
-    ASSIGN_IF_NOT_NULL(result->SQL_DATETIME_SUB, column_object[U("sql_DATETIME_SUB")], as_integer()); // vero doesn't have this
-    ASSIGN_IF_NOT_NULL(result->CHAR_OCTET_LENGTH, column_object[U("char_OCTET_LENGTH")], as_integer()); // vero doesn't have this
-    result->ORDINAL_POSITION = count; // 17
-    result->IS_NULLABLE = ""; // vero doesn't have this
-
-    /*
-    x_ASSIGN_IF_NOT_NULL(result->SCOPE_CATLOG, column_object[U("scope_CATLOG")], as_string()); // vero doesn't have this
-    x_ASSIGN_IF_NOT_NULL(result->SCOPE_SCHEMA, column_object[U("scope_SCHEMA")], as_string()); // vero doesn't have this
-    x_ASSIGN_IF_NOT_NULL(result->SCOPE_TABLE, column_object[U("scope_TABLE")], as_string()); // vero doesn't have this
-    x_ASSIGN_IF_NOT_NULL(result->IS_AUTOINCREMENT, column_object[U("iS_AUTOINCREMENT")], as_string()); // vero doesn't have this
-    if (!column_object[U("source_DATA_TYPE")].is_null()) {
-        result->SOURCE_DATA_TYPE = (short)column_object[U("source_DATA_TYPE")].as_integer();
-    }
-    // the orig value passed from REST is java.sql.Types, we convert it to SQL Type
-    if (!column_object[U("data_TYPE")].is_null()) {
-    result->DATA_TYPE = JDBC2ODBC(column_object[U("data_TYPE")].as_integer());
-    }
-
-    if (!column_object[U("sql_DATA_TYPE")].is_null()) {
-    result->SQL_DATA_TYPE = JDBC2ODBC(column_object[U("sql_DATA_TYPE")].as_integer());
-    }
-    */
-#endif
 
 	return result;
 }
@@ -188,7 +143,11 @@ std::unique_ptr<SQLResponse> SQLResponseFromJSON(web::json::value & object) {
 	web::json::value& o_columnMetas = object[U("columnMetas")];
 	web::json::value& o_results = object[U("results")];
 	result->affectedRowCount = object[U("affectedRowCount")].as_integer();
+#if defined(_KYLIN_REST_SERVICE)
 	result->isException = object[U("isException")].as_bool();
+#else
+    result->isException = object[U("exception")].as_bool();
+#endif
 	ASSIGN_IF_NOT_NULL(result->exceptionMessage, object[U("exceptionMessage")], as_string());
 
 	if (!o_columnMetas.is_null()) {
