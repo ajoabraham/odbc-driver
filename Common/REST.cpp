@@ -257,7 +257,12 @@ std::wstringstream makeMetaUri(char* project) {
 	return uri;
 }
 
-std::unique_ptr<MetadataResponse> restGetMeta(char* serverAddr, long port, char* username, char* passwd, char* project) {
+std::unique_ptr<MetadataResponse> restGetMeta(
+    char* serverAddr, 
+    long port, 
+    char* username, 
+    char* passwd, 
+    char* project) {
 	wstring  serverAddrW = completeServerStr(serverAddr, port);
 	http_client_config config;
 	config.set_timeout(utility::seconds(300));
@@ -268,19 +273,13 @@ std::unique_ptr<MetadataResponse> restGetMeta(char* serverAddr, long port, char*
 
 	if (response.status_code() == status_codes::OK) {
 		return MetadataResponseFromJSON(response.extract_json().get());
-	}
-
-	else if (response.status_code() == status_codes::Unauthorized) {
+	} else if (response.status_code() == status_codes::Unauthorized) {
 		throw exception("Username/Password Unauthorized.");
-	}
-
-	else if (response.status_code() == status_codes::InternalError) {
+	} else if (response.status_code() == status_codes::InternalError) {
 		std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(response.extract_json().get());
 		string errorMsg = wstring2string(em->msg);
 		throw  exception(errorMsg.c_str());
-	}
-
-	else {
+	} else {
 		throw exception("REST request(getmeta) Invalid Response status code : " + response.status_code());
 	}
 }
@@ -362,17 +361,21 @@ std::wstringstream makeQueryUri(char* project) {
 	return uri;
 }
 
-std::unique_ptr<SQLResponse> restQuery(wchar_t* rawSql, char* serverAddr, long port, char* username,
+std::unique_ptr<SQLResponse> restQuery(
+    wchar_t* rawSql, 
+    char* serverAddr, 
+    long port, 
+    char* username,
 	char* passwd,
 	char* project) {
+#if defined(_KYLIN_REST_SERVICE)
 	//using local cache to intercept probing queries
 	std::unique_ptr<SQLResponse> cachedQueryRes = loadCache(rawSql);
 
-	if (cachedQueryRes != NULL)
-	{
+	if (cachedQueryRes != NULL) {
 		return cachedQueryRes;
 	}
-
+#endif
 	//real requesting
 	wstring serverAddrW = completeServerStr(serverAddr, port);
 	http_client_config config;
@@ -382,7 +385,11 @@ std::unique_ptr<SQLResponse> restQuery(wchar_t* rawSql, char* serverAddr, long p
 	http_request request = makeRequest(username, passwd, wss1.str().c_str(), methods::POST);
 	wstring sql = cookQuery(rawSql);
 	std::wstringstream wss2;
+#if defined(_KYLIN_REST_SERVICE)
 	wss2 << L"{ \"acceptPartial\": false, \"project\" : \"" << project << L"\", " << " \"sql\" : \"" << sql << L"\" }";
+#else
+    wss2 << L"{ \"sql\" : \"" << sql << L"\" }";
+#endif
 	request.set_body(wss2.str(), L"application/json");
 	request.headers().add(header_names::accept_encoding, "gzip,deflate");
 	http::status_code status;
