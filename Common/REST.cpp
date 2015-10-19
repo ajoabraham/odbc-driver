@@ -130,22 +130,29 @@ void overwrite(SQLResponse* res) {
 }
 
 std::wstring completeServerStr(char* serverStr, long port) {
-	//concat the whole server string
+    char tempServerStr[256];
+    strcpy(tempServerStr, serverStr);
+
+	// concat the whole server string
 	char completeServerAddr[256];
 	char portSuffix[10];
 	sprintf(portSuffix, ":%d", port);
 
-	if (strstr(serverStr, "https://") == serverStr ||
-		strstr(serverStr, "http://") == serverStr) {
-		sprintf(completeServerAddr, "%s", serverStr);
-	}
+    // remove trailing '/'
+    int size = strlen(tempServerStr);
+    if (tempServerStr[size - 1] == '/') {
+        tempServerStr[size - 1] = '\0';
+    }
 
-	else {
+    if (strstr(tempServerStr, "https://") == tempServerStr ||
+        strstr(tempServerStr, "http://") == tempServerStr) {
+        sprintf(completeServerAddr, "%s", tempServerStr);
+	} else {
 		// by default use https
-		sprintf(completeServerAddr, "https://%s", serverStr);
+        sprintf(completeServerAddr, "https://%s", tempServerStr);
 	}
 
-	if (strstr(serverStr, portSuffix) == NULL) {
+    if (strstr(tempServerStr, portSuffix) == NULL) {
 		strcat(completeServerAddr, portSuffix);
 	}
 

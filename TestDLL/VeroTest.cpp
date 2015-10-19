@@ -9,7 +9,6 @@ void veroRestApiTest() {
         report();
     }
 
-    /*
     // rest projects
 	std::map<string, string> projectMap;
 	restListProjects(KServerAddr, KPort, KUserName, KPassword, projectMap);
@@ -18,6 +17,7 @@ void veroRestApiTest() {
 		cout << "Project = " << (*i).first << endl;
 	}
 
+    /*
     // rest meta
     std::unique_ptr<MetadataResponse> metaResponse = restGetMeta(KServerAddr, KPort, KUserName, KPassword, KDefaultProject);
     */
