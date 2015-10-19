@@ -68,6 +68,7 @@ ColumnMeta* ColumnMetaFromJSON(
 
 std::unique_ptr<MetadataResponse> MetadataResponseFromJSON(web::json::value & object) {
 	std::unique_ptr<MetadataResponse> result(new MetadataResponse());
+
 	web::json::array& tableMetaArray = object.as_array();
 
     for (auto outer_iter = tableMetaArray.begin(); outer_iter != tableMetaArray.end(); ++outer_iter) {

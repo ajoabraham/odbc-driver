@@ -4,12 +4,14 @@
 #define prod_KPort 443
 
 //#define KServerAddr "http://localhost"
-#define KServerAddr "http://7d606f1e.ngrok.com"
+//#define KServerAddr "http://54.152.150.114"
+#define KServerAddr "http://localhost"
 
-#define KPort 80
-#define KUserName "ADMIN"
-#define KPassword "KADMIN"
-#define KDefaultProject "default"
+//#define KPort 9000
+#define KPort 8080
+#define KUserName "admin"
+#define KPassword "admin"
+#define KDefaultProject "yulins_project"
 
 #include <conio.h>
 #include <stdio.h>

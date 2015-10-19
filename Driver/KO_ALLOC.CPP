@@ -113,6 +113,7 @@ RETCODE SQL_API SQLAllocConnect(HENV pEnvHandle, HDBC* pOutputHandlePtr) {
     ((pODBCConn)conn)->TxnIsolation = 0;
     ((pODBCConn)conn)->MaxRows = 0;
     ((pODBCConn)conn)->QueryTimeout = 0;
+    ((pODBCConn)conn)->projectMap = new std::map<string, string>();
     // attach it to link list
     _SQLAttachConn((pODBCEnv)pEnvHandle, conn);
     // pass back conn to caller
@@ -521,7 +522,11 @@ RETCODE SQL_API _SQLDisconnect(pODBCConn pHandle) {
         pHandle->Stmts = NULL;
     }
 
-    pHandle->projectMap.clear();
+    if (pHandle->projectMap) {
+        pHandle->projectMap->clear();
+        delete pHandle->projectMap;
+        pHandle->projectMap = NULL;
+    }
 
     //free meta
     if (pHandle->meta) {

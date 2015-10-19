@@ -379,9 +379,9 @@ INT_PTR CALLBACK DlgDSNCfg1Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
                     EnableWindow(hwndCombo, TRUE);
 
                     try {
-                        restListProjects(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, pgConn->projectMap);
+                        restListProjects(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, *(pgConn->projectMap));
 
-                        for (std::map<string, string>::iterator i = pgConn->projectMap.begin(); i != pgConn->projectMap.end(); i++) {
+                        for (std::map<string, string>::iterator i = (*(pgConn->projectMap)).begin(); i != (*(pgConn->projectMap)).end(); i++) {
                             SendMessage(hwndCombo, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(*i).first.c_str());
                         }
 
@@ -958,7 +958,7 @@ RETCODE TryFetchProjects(pODBCConn pgConn) {
     __ODBCLOG(_ODBCLogMsg(LogLevel_DEBUG, "Start fetching projects.."));
 
     try {
-        restListProjects(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, pgConn->projectMap);
+        restListProjects(pgConn->Server, pgConn->ServerPort, pgConn->UserName, pgConn->Password, *(pgConn->projectMap));
     }
 
     catch (const exception& e) {

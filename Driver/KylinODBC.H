@@ -446,7 +446,7 @@ struct ODBCConn {
     struct ODBCConn*     Next;                                           // next connection
     struct ODBCConn*     Prev;                                           // prev connection
 
-    std::map<string, string> projectMap;
+    std::map<string, string> *projectMap;
     std::unique_ptr<MetadataResponse> meta;                                 // ACTUAL metadata returned from REST Server
 };
 

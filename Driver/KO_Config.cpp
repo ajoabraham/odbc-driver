@@ -22,7 +22,7 @@
 
 static char currentDSN[BUFFERSIZE];
 
-static std::map<string, string> projectMap;
+static std::map<string, string> gProjectMap;
 
 static int GetValueFromODBCINI(char* section, char* key, char* defaultValue, char* buffer, int bufferSize,
     char* initFileName) {
@@ -234,6 +234,7 @@ static pODBCConn createConn() {
     ((pODBCConn)conn)->UserName = new char[BUFFERSIZE];
     ((pODBCConn)conn)->Password = new char[BUFFERSIZE];
     ((pODBCConn)conn)->Project = new char[BUFFERSIZE];
+    ((pODBCConn)conn)->projectMap = new std::map<string, string>();
     return conn;
 }
 
@@ -428,6 +429,7 @@ static eGoodBad RetriveDlgDataToODBCINI(HWND hDlg, bool onlyTest) {
         ((pODBCConn)conn)->Server = new char[BUFFERSIZE];
         ((pODBCConn)conn)->UserName = new char[BUFFERSIZE];
         ((pODBCConn)conn)->Password = new char[BUFFERSIZE];
+        ((pODBCConn)conn)->projectMap = new std::map<string, string>();
         strcpy(((pODBCConn)conn)->Server, serverStr);
         strcpy(((pODBCConn)conn)->UserName, uidStr);
         strcpy(((pODBCConn)conn)->Password, pwdStr);
@@ -574,10 +576,10 @@ INT_PTR CALLBACK DlgDSNCfg2Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
                             EnableWindow(hwndCombo, TRUE);
 
                             try {
-                                projectMap.clear();
-                                restListProjects(serverStr, port, uidStr, pwdStr, projectMap);
+                                gProjectMap.clear();
+                                restListProjects(serverStr, port, uidStr, pwdStr, gProjectMap);
 
-                                for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
+                                for (std::map<string, string>::iterator i = gProjectMap.begin(); i != gProjectMap.end(); i++) {
                                     SendMessage(hwndCombo, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(*i).first.c_str());
                                 }
 
@@ -616,11 +618,11 @@ INT_PTR CALLBACK DlgDSNCfg2Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
                         (WPARAM)ItemIndex, (LPARAM)projectName);
 
                     if (RetriveDlgData(hDlg, newDSN, serverStr, uidStr, pwdStr, &port) == GOOD) {
-                        auto find = projectMap.find(std::string(projectName));
+                        auto find = gProjectMap.find(std::string(projectName));
                         std::string projectSlug;
 
-                        if (find != projectMap.end()) {
-                            projectSlug = projectMap.at(std::string(projectName));
+                        if (find != gProjectMap.end()) {
+                            projectSlug = gProjectMap.at(std::string(projectName));
                         } else {
                             projectSlug = projectName;
                         }

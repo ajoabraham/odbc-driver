@@ -12,6 +12,6 @@ int main() {
     //queryFlowTest();
     //crossValidate();
 
-	//veroRestApiTest();
-	veroMakeUriTest();
+	veroRestApiTest();
+	//veroMakeUriTest();
 }
