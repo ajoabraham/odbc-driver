@@ -19,6 +19,16 @@ void veroRestApiTest() {
 
     // rest meta
     std::unique_ptr<MetadataResponse> metaResponse = restGetMeta(KServerAddr, KPort, KUserName, KPassword, KDefaultProject);
+
+	// rest query
+	{
+		std::unique_ptr<SQLResponse> y = restQuery(L"select Year", KServerAddr, KPort,
+			KUserName, KPassword, KDefaultProject);
+
+		if ((int)y->results.size() != 1) {
+			report();
+		}
+	}
 }
 
 
