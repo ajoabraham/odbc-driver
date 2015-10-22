@@ -11,7 +11,7 @@
 //#define KPort 8080
 #define KUserName "aaa"
 #define KPassword "bbb"
-#define KDefaultProject "yulins_project"
+#define KDefaultProject "yulin_s_project"
 
 #include <conio.h>
 #include <stdio.h>

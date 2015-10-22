@@ -17,10 +17,8 @@ void veroRestApiTest() {
 		cout << "Project = " << (*i).first << endl;
 	}
 
-    /*
     // rest meta
     std::unique_ptr<MetadataResponse> metaResponse = restGetMeta(KServerAddr, KPort, KUserName, KPassword, KDefaultProject);
-    */
 }
 
 

@@ -63,6 +63,8 @@ ODBCTypes JDBC2ODBC ( int jtype ) {
             break;
             
         case JDBC_LONGVARCHAR:
+		// TODO: 20151022 yulinwen: adding JDBC_LONGNVARCHCAR here, don't know if it may cause issues later
+		case JDBC_LONGNVARCHAR:
             return ODBCTypes::ODBC_LongVarChar;
             break;
             
