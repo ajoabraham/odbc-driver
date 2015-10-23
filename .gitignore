@@ -35,11 +35,15 @@
 
 # Ignore output folders
 3rdParty/zlib-1.2.8/contrib/vstudio/vc11/x86/
+3rdParty/zlib-1.2.8/contrib/vstudio/vc11/x64/
 Common/Win32/
+Common/x64/
 Driver/Win32/
+Driver/x64/
 Release/
 TestDLL/Debug/
 TestDLL/Release/
 ipch/
-Installer/Installer/Express/SingleImage
+Installer/Installer/Express/
+Installer(64bit)/Installer(64bit)/Express/
 

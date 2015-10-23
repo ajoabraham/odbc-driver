@@ -101,7 +101,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(CPPREST_HOME)\Release\include;$(SolutionDir)\Common\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(CPPREST_HOME)\Binaries\Release64;$(SolutionDir)\Common\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(CPPREST_HOME)\Binaries\x64\Release;$(SolutionDir)\Common\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
@@ -115,7 +115,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(CPPREST_HOME)\Release\include;$(SolutionDir)\Common\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(CPPREST_HOME)\Binaries\Debug64;$(SolutionDir)\Common\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(CPPREST_HOME)\Binaries\x64\Debug;$(SolutionDir)\Common\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
@@ -211,7 +211,7 @@
       <SubSystem>Console</SubSystem>
       <OutputFile>$(Platform)\$(Configuration)\driver.dll</OutputFile>
       <ImportLibrary>$(Platform)\$(Configuration)\driver.lib</ImportLibrary>
-      <AdditionalDependencies>odbccp32.lib;odbc32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;cpprest110_2_0.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbccp32.lib;odbc32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;cpprest120_2_0.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\driver.DEF</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
@@ -303,7 +303,7 @@
       <SubSystem>Console</SubSystem>
       <OutputFile>$(Platform)\$(Configuration)\driver.dll</OutputFile>
       <ImportLibrary>$(Platform)\$(Configuration)\driver.lib</ImportLibrary>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;cpprest110d_2_0.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;mswsock.lib;ws2_32.lib;winhttp.lib;cpprest120d_2_0.lib;Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\driver.DEF</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
