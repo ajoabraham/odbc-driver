@@ -11,6 +11,7 @@
 #define UIDKEY "UID"
 #define PWDKEY "PWD"
 #define PROJECTKEY "PROJECT"
+#define PROJECTSLUGKEY "PROJECTSLUG"
 
 #define BUFFERSIZE 256
 
@@ -284,14 +285,21 @@ static eGoodBad testConnection(char* serverStr, char* uidStr, char* pwdStr, long
     return GOOD;
 }
 
-static eGoodBad SaveConfigToODBCINI(char* newDSN, char* serverStr, char* uidStr, char* pwdStr, long port,
-    char* projectStr) {
+static eGoodBad SaveConfigToODBCINI(
+    char* newDSN, 
+    char* serverStr, 
+    char* uidStr, 
+    char* pwdStr, 
+    long port,
+    char* projectStr,
+    char *projectSlugStr) {
     char portStrBuffer[BUFFERSIZE];
     SetValueInODBCINI(newDSN, SERVERKEY, serverStr, INITFILE);
     SetValueInODBCINI(newDSN, PORTKEY, _itoa(port, portStrBuffer, 10), INITFILE);
     SetValueInODBCINI(newDSN, UIDKEY, uidStr, INITFILE);
     SetValueInODBCINI(newDSN, PWDKEY, pwdStr, INITFILE);
     SetValueInODBCINI(newDSN, PROJECTKEY, projectStr, INITFILE);
+    SetValueInODBCINI(newDSN, PROJECTSLUGKEY, projectSlugStr, INITFILE);
 
     //If a new dsn name comes, add a new entry in regedit
     if (_stricmp(newDSN, currentDSN) != 0) {
@@ -531,7 +539,9 @@ eGoodBad  LoadODBCINIDataToConn(pODBCConn pConn) {
     // set value in struct
     SetConnProp(pConn, CONN_PROP_PWD, buffer);
     ////// Project
-    c = GetValueFromODBCINI(currentDSN, PROJECTKEY, "", buffer, BUFFERSIZE, INITFILE);
+    // TODO: 20151023 yulinwen: use PROJECTSLUGKEY instead of PROJECTKEY
+    //c = GetValueFromODBCINI(currentDSN, PROJECTKEY, "", buffer, BUFFERSIZE, INITFILE);
+    c = GetValueFromODBCINI(currentDSN, PROJECTSLUGKEY, "", buffer, BUFFERSIZE, INITFILE);
 
     if (c <= 0) {
         __ODBCPOPMSG(_ODBCPopMsg("Please config the Kylin DSN in odbcad.exe before using it."));
@@ -620,6 +630,7 @@ INT_PTR CALLBACK DlgDSNCfg2Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
                     if (RetriveDlgData(hDlg, newDSN, serverStr, uidStr, pwdStr, &port) == GOOD) {
                         auto find = gProjectMap.find(std::string(projectName));
                         std::string projectSlug;
+                        TCHAR projectSlugTemp[256];
 
                         if (find != gProjectMap.end()) {
                             projectSlug = gProjectMap.at(std::string(projectName));
@@ -627,8 +638,10 @@ INT_PTR CALLBACK DlgDSNCfg2Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
                             projectSlug = projectName;
                         }
 
+                        strcpy(projectSlugTemp, projectSlug.c_str());
+
                         if (testGetMetadata(serverStr, uidStr, pwdStr, port, projectSlug.c_str()) == GOOD) {
-                            SaveConfigToODBCINI(newDSN, serverStr, uidStr, pwdStr, port, projectName);
+                            SaveConfigToODBCINI(newDSN, serverStr, uidStr, pwdStr, port, projectName, projectSlugTemp);
                             EndDialog(hDlg, wParam);
                             return TRUE;
                         }
