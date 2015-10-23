@@ -405,7 +405,21 @@ INT_PTR CALLBACK DlgDSNCfg1Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
                     TCHAR  projectName[256];
                     (TCHAR)SendMessage((HWND)hwndCombo, (UINT)CB_GETLBTEXT,
                         (WPARAM)ItemIndex, (LPARAM)projectName);
-                    SetConnProp(pgConn, CONN_PROP_PROJECT, projectName);
+
+                    // TODO 20151023 yulinwen: fix driver connect issue
+                    auto find = pgConn->projectMap->find(std::string(projectName));
+                    std::string projectSlug;
+                    TCHAR projectSlugTemp[256];
+
+                    if (find != pgConn->projectMap->end()) {
+                        projectSlug = pgConn->projectMap->at(std::string(projectName));
+                    } else {
+                        projectSlug = projectName;
+                    }
+
+                    strcpy(projectSlugTemp, projectSlug.c_str());
+
+                    SetConnProp(pgConn, CONN_PROP_PROJECT, projectSlugTemp);
                     //last trial with project given
                     ret = TryFetchMetadata(pgConn);
 
