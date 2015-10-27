@@ -375,14 +375,13 @@ std::unique_ptr<SQLResponse> restQuery(
     char* username,
 	char* passwd,
 	char* project) {
-#if defined(_KYLIN_REST_SERVICE)
 	//using local cache to intercept probing queries
 	std::unique_ptr<SQLResponse> cachedQueryRes = loadCache(rawSql);
 
 	if (cachedQueryRes != NULL) {
 		return cachedQueryRes;
 	}
-#endif
+
 	//real requesting
 	wstring serverAddrW = completeServerStr(serverAddr, port);
 	http_client_config config;
