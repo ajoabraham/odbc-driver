@@ -7,15 +7,20 @@
 #include "Dump.h"
 #include "JsonConverter.h"
 
+const wchar_t* alwaysFailQueries[8] = {
+	//L"(\\s)*CREATE(\\s)*LOCAL(\\s)*TEMPORARY(\\s)*TABLE(\\s)*\"XTableau_B_Connect\"(\\s)*\\((\\s)*\"COL\"(\\s)*INTEGER(\\s)*\\)(\\s)*ON(\\s)*COMMIT(\\s)*PRESERVE(\\s)*ROWS(\\s)*",
+	//L"(\\s)*DROP(\\s)*TABLE(\\s)*\"XTableau_B_Connect\"(\\s)*",
+	//L"(\\s)*INSERT(\\s)*INTO(\\s)*\"XTableau_C_Connect\"(\\s)*SELECT(\\s)*\\*(\\s)*FROM(\\s)*\\(SELECT(\\s)*1(\\s)*AS(\\s)*COL(\\s)*\\)(\\s)*AS(\\s)*CHECKTEMP(\\s)*LIMIT(\\s)*1(\\s)*",
+	//L"(\\s)*DROP(\\s)*TABLE(\\s)*\"XTableau_C_Connect\"(\\s)*"
 
-const wchar_t* alwaysFailQueries[7] = {
-    L"(\\s)*CREATE(\\s)*LOCAL(\\s)*TEMPORARY(\\s)*TABLE(\\s)*\"XTableau_B_Connect\"(\\s)*\\((\\s)*\"COL\"(\\s)*INTEGER(\\s)*\\)(\\s)*ON(\\s)*COMMIT(\\s)*PRESERVE(\\s)*ROWS(\\s)*",
-    L"(\\s)*DROP(\\s)*TABLE(\\s)*\"XTableau_B_Connect\"(\\s)*",
-    L"(\\s)*SELECT(\\s)*TOP(\\s)*1(\\s)*\"COL\"(\\s)*FROM(\\s)*\\(SELECT(\\s)*1(\\s)*AS(\\s)*\"COL\"(\\s)*\\)(\\s)*AS(\\s)*\"CHECKTOP\"(\\s)*",
-    L"(\\s)*SELECT(\\s)*\"SUBCOL\"(\\s)*AS(\\s)*\"COL\"(\\s)*FROM(\\s)*\\((\\s)*SELECT(\\s)*1(\\s)*AS(\\s)*\"SUBCOL\"(\\s)*\\)(\\s)*\"SUBQUERY\"(\\s)*GROUP(\\s)*BY(\\s)*1(\\s)*",
-    L"(\\s)*SELECT(\\s)*\"SUBCOL\"(\\s)*AS(\\s)*\"COL\"(\\s)*FROM(\\s)*\\((\\s)*SELECT(\\s)*1(\\s)*AS(\\s)*\"SUBCOL\"(\\s)*\\)(\\s)*\"SUBQUERY\"(\\s)*GROUP(\\s)*BY(\\s)*\"COL\"(\\s)*",
-    L"(\\s)*INSERT(\\s)*INTO(\\s)*\"XTableau_C_Connect\"(\\s)*SELECT(\\s)*\\*(\\s)*FROM(\\s)*\\(SELECT(\\s)*1(\\s)*AS(\\s)*COL(\\s)*\\)(\\s)*AS(\\s)*CHECKTEMP(\\s)*LIMIT(\\s)*1(\\s)*",
-    L"(\\s)*DROP(\\s)*TABLE(\\s)*\"XTableau_C_Connect\"(\\s)*"
+	L"(\\s)*CREATE(\\s)*LOCAL(\\s)*TEMPORARY(\\s)*TABLE(\\s)*\"(\\w)*\"(\\s)*\\((\\s)*\"COL\"(\\s)*INTEGER(\\s)*\\)(\\s)*ON(\\s)*COMMIT(\\s)*PRESERVE(\\s)*ROWS(\\s)*",
+	L"(\\s)*DROP(\\s)*TABLE(\\s)*\"(\\w)*\"(\\s)*",
+	L"(\\s)*SELECT(\\s)*TOP(\\s)*1(\\s)*\"COL\"(\\s)*FROM(\\s)*\\(SELECT(\\s)*1(\\s)*AS(\\s)*\"COL\"(\\s)*\\)(\\s)*AS(\\s)*\"CHECKTOP\"(\\s)*",
+	L"(\\s)*SELECT(\\s)*\"SUBCOL\"(\\s)*AS(\\s)*\"COL\"(\\s)*FROM(\\s)*\\((\\s)*SELECT(\\s)*1(\\s)*AS(\\s)*\"SUBCOL\"(\\s)*\\)(\\s)*\"SUBQUERY\"(\\s)*GROUP(\\s)*BY(\\s)*1(\\s)*",
+	L"(\\s)*SELECT(\\s)*\"SUBCOL\"(\\s)*AS(\\s)*\"COL\"(\\s)*FROM(\\s)*\\((\\s)*SELECT(\\s)*1(\\s)*AS(\\s)*\"SUBCOL\"(\\s)*\\)(\\s)*\"SUBQUERY\"(\\s)*GROUP(\\s)*BY(\\s)*\"COL\"(\\s)*",
+	L"(\\s)*INSERT(\\s)*INTO(\\s)*\"(\\w)*\"(\\s)*SELECT(\\s)*\\*(\\s)*FROM(\\s)*\\(SELECT(\\s)*1(\\s)*AS(\\s)*COL(\\s)*\\)(\\s)*AS(\\s)*CHECKTEMP(\\s)*LIMIT(\\s)*1(\\s)*",
+	L"(\\s)*SELECT(\\s)*\\*(\\s)*INTO(\\s)*\"(\\w)*\"(\\s)*FROM(\\s)*\\(SELECT(\\s)*1(\\s)*AS(\\s)*COL(\\s)*\\)(\\s)*AS(\\s)*CHECKTEMP(\\s)*LIMIT(\\s)*1(\\s)*",
+	L"(\\s)*DROP(\\s)*TABLE(\\s)*\"(\\w)*\"(\\s)*"
 };
 
 const wchar_t* alwaysSuccessQueries[3] = {

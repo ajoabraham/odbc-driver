@@ -34,5 +34,6 @@ void restAPITest();
 void crossValidate();
 
 void veroRestApiTest();
+void veroProbeQueryTest();
 void veroMakeUriTest();
 
