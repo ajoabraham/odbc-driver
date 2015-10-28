@@ -144,11 +144,13 @@ std::unique_ptr<SQLResponse> SQLResponseFromJSON(web::json::value & object) {
 	web::json::value& o_columnMetas = object[U("columnMetas")];
 	web::json::value& o_results = object[U("results")];
 	result->affectedRowCount = object[U("affectedRowCount")].as_integer();
-#if defined(_KYLIN_REST_SERVICE)
-	result->isException = object[U("isException")].as_bool();
-#else
-    result->isException = object[U("exception")].as_bool();
-#endif
+
+    if (!object[U("isException")].is_null()) {
+        result->isException = object[U("isException")].as_bool();
+    } else if (!object[U("exception")].is_null()) {
+        result->isException = object[U("exception")].as_bool();
+    }
+
 	ASSIGN_IF_NOT_NULL(result->exceptionMessage, object[U("exceptionMessage")], as_string());
 
 	if (!o_columnMetas.is_null()) {
