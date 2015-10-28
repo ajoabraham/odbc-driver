@@ -47,8 +47,15 @@ RETCODE SQL_API SQLGetInfoW(
     _SQLFreeDiag(_DIAGCONN(pConn));
 
     // check the info required
-    // check this page for detailed http://msdn.microsoft.com/en-us/library/ms711681(v=vs.85).aspx
+    // check this page for detailed http://msdn.microsoft.com/en-us/library/ms711681(v=vs.85).asxp
     switch (pInfoType) {
+        case SQL_CREATE_TABLE://132
+            *((Long*)pInfoValuePtr) = 0;
+            break;
+        case SQL_DROP_TABLE://141
+            *((Long*)pInfoValuePtr) = 0;
+            break;
+
         case SQL_COLUMN_ALIAS://87 called
             _SQLCopyWCharData(_DIAGCONN(pConn), pInfoValuePtr, pBufferLength, pStringLengthPtr, 16, "Y", -1);
             break;
@@ -593,6 +600,13 @@ RETCODE SQL_API SQLGetInfo(SQLHDBC         pConn,
 
     // check the info required
     switch (pInfoType) {
+        case SQL_CREATE_TABLE://132
+            *((Long*)pInfoValuePtr) = 0;
+            break;
+        case SQL_DROP_TABLE://141
+            *((Long*)pInfoValuePtr) = 0;
+            break;
+
         case SQL_COLUMN_ALIAS://87 called
             _SQLCopyCharData(_DIAGCONN(pConn), pInfoValuePtr, pBufferLength, pStringLengthPtr, 16, "Y", -1);
             break;
