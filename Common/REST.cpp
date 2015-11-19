@@ -282,6 +282,24 @@ std::unique_ptr<MetadataResponse> restGetMeta(
 	}
 }
 
+std::unique_ptr<MetadataResponse> restGetMetaTest(
+	char* project) {
+	std::string all;
+	std::string line;
+
+	ifstream jsonFile("schema.json");
+	if (jsonFile.is_open()) {
+		while (std::getline(jsonFile, line)) {
+			all += line;
+			all.push_back('\n');
+		}
+	}
+
+	web::json::value schema = web::json::value::parse(string2wstring(all));
+
+	return MetadataResponseFromJSON(schema);
+}
+
 wstring cookQuery(wchar_t* p) {
 	wchar_t* q = new wchar_t[wcslen(p) + 1];
 	wcscpy(q, p);
