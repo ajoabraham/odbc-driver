@@ -100,3 +100,15 @@ void veroMakeUriTest() {
 	cout << "Meta uri = " << metaUriPtr.get() << "\n";
 	cout << "Query uri = " << queryUriPtr.get() << "\n";
 }
+
+void veroJsonTest() {
+	// rest projects
+	cout << "veroJsonTest..." << "\n";
+
+	std::map<string, string> projectMap;
+	restListProjectsTest(projectMap);
+
+	for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
+		cout << "Project = " << (*i).first << endl;
+	}
+}

@@ -226,33 +226,24 @@ void restListProjects(char* serverAddr, long port, char* username, char* passwd,
 	}
 }
 
-/*
-void restListProjects ( char* serverAddr, long port, char* username, char* passwd , std::vector<string>& holder ) {
-wstring  serverAddrW = completeServerStr ( serverAddr,  port );
-http_client_config config;
-config.set_timeout ( utility::seconds ( 300 ) );
-http_client session ( serverAddrW, config );
-http_request request = makeRequest(username, passwd, REST_URI_PROJECTS, methods::GET);
-http_response response = session.request ( request ).get();
+void restListProjectsTest(std::map<string, string>& projectMap) {
+	std::string all;
+	std::string line;
 
-if ( response.status_code() == status_codes::OK ) {
-web::json::value projects = response.extract_json().get();
+	ifstream jsonFile("projects.json");
+	if (jsonFile.is_open()) {
+		while (std::getline(jsonFile, line)) {
+			all += line;
+			all.push_back('\n');
+		}
+	}
 
-for ( auto iter = projects.as_array().begin(); iter != projects.as_array().end(); ++iter ) {
-holder.push_back ( wstring2string ( ( *iter ) [U ( "name" )].as_string() ) );
-}
+	web::json::value projects = web::json::value::parse(string2wstring(all));
 
-if ( holder.size() == 0 )
-{ throw exception ( "There is no project available in this server" ); }
-} else if ( response.status_code() == status_codes::InternalError ) {
-std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON ( response.extract_json().get() );
-string errorMsg = wstring2string ( em->msg );
-throw  exception ( errorMsg.c_str() );
-} else {
-throw exception ( "REST request(listproject) Invalid Response status code : " + response.status_code() );
+	for (auto iter = projects.as_array().begin(); iter != projects.as_array().end(); ++iter) {
+		projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("slug")].as_string())));
+	}
 }
-}
-*/
 
 std::wstringstream makeMetaUri(char* project) {
 	std::wstringstream uri;

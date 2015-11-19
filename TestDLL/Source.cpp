@@ -14,5 +14,6 @@ int main() {
 
 	//veroRestApiTest();
 	//veroMakeUriTest();
-	veroProbeQueryTest();
+	//veroProbeQueryTest();
+	veroJsonTest();
 }
