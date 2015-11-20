@@ -41,6 +41,7 @@ Common/x64/
 Driver/Win32/
 Driver/x64/
 Release/
+Release_Test/
 TestDLL/Debug/
 TestDLL/Release/
 ipch/
