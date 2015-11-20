@@ -173,6 +173,7 @@ http_request makeRequest(const char* username, const char* passwd, const wchar_t
 }
 
 bool restAuthenticate(char* serverAddr, long port, char* username, char* passwd) {
+#if !defined(JSON_TEST)
 	wstring  serverAddrW = completeServerStr(serverAddr, port);
 	http_client_config config;
 	config.set_timeout(utility::seconds(300));
@@ -190,9 +191,17 @@ bool restAuthenticate(char* serverAddr, long port, char* username, char* passwd)
 	{
 		return false;
 	}
+#else
+    return restAuthenticateTest();
+#endif
+}
+
+bool restAuthenticateTest() { 
+    return true; 
 }
 
 void restListProjects(char* serverAddr, long port, char* username, char* passwd, std::map<string, string>& projectMap) {
+#if !defined(JSON_TEST)
 	wstring  serverAddrW = completeServerStr(serverAddr, port);
 	http_client_config config;
 	config.set_timeout(utility::seconds(300));
@@ -224,24 +233,27 @@ void restListProjects(char* serverAddr, long port, char* username, char* passwd,
 	else {
 		throw exception("REST request(listproject) Invalid Response status code : " + response.status_code());
 	}
+#else
+    return restListProjectsTest(projectMap);
+#endif
 }
 
 void restListProjectsTest(std::map<string, string>& projectMap) {
 	std::string all;
 	std::string line;
 
-	ifstream jsonFile("projects.json");
+	ifstream jsonFile("C:\\kylin\\projects.json");
 	if (jsonFile.is_open()) {
 		while (std::getline(jsonFile, line)) {
 			all += line;
 			all.push_back('\n');
 		}
-	}
 
-	web::json::value projects = web::json::value::parse(string2wstring(all));
+        web::json::value projects = web::json::value::parse(string2wstring(all));
 
-	for (auto iter = projects.as_array().begin(); iter != projects.as_array().end(); ++iter) {
-		projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("slug")].as_string())));
+        for (auto iter = projects.as_array().begin(); iter != projects.as_array().end(); ++iter) {
+            projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("slug")].as_string())));
+        }
 	}
 }
 
@@ -261,6 +273,7 @@ std::unique_ptr<MetadataResponse> restGetMeta(
     char* username, 
     char* passwd, 
     char* project) {
+#if !defined(JSON_TEST)
 	wstring  serverAddrW = completeServerStr(serverAddr, port);
 	http_client_config config;
 	config.set_timeout(utility::seconds(300));
@@ -280,14 +293,16 @@ std::unique_ptr<MetadataResponse> restGetMeta(
 	} else {
 		throw exception("REST request(getmeta) Invalid Response status code : " + response.status_code());
 	}
+#else
+    return restGetMetaTest();
+#endif
 }
 
-std::unique_ptr<MetadataResponse> restGetMetaTest(
-	char* project) {
+std::unique_ptr<MetadataResponse> restGetMetaTest() {
 	std::string all;
 	std::string line;
 
-	ifstream jsonFile("schema.json");
+	ifstream jsonFile("C:\\kylin\\schema.json");
 	if (jsonFile.is_open()) {
 		while (std::getline(jsonFile, line)) {
 			all += line;
@@ -384,6 +399,7 @@ std::unique_ptr<SQLResponse> restQuery(
     char* username,
 	char* passwd,
 	char* project) {
+#if !defined(JSON_TEST)
 	//using local cache to intercept probing queries
 	std::unique_ptr<SQLResponse> cachedQueryRes = loadCache(rawSql);
 
@@ -448,4 +464,41 @@ std::unique_ptr<SQLResponse> restQuery(
 	}
 
 	return NULL;
+#else
+    return restQueryTest(rawSql);
+#endif
 }
+
+std::unique_ptr<SQLResponse> restQueryTest(wchar_t* rawSql) {
+    //using local cache to intercept probing queries
+    std::unique_ptr<SQLResponse> cachedQueryRes = loadCache(rawSql);
+
+    if (cachedQueryRes != NULL) {
+        return cachedQueryRes;
+    }
+
+    std::string all;
+    std::string line;
+    std::unique_ptr<SQLResponse> ret = NULL;
+
+    ifstream jsonFile("C:\\kylin\\query.json");
+    if (jsonFile.is_open()) {
+        while (std::getline(jsonFile, line)) {
+            all += line;
+            all.push_back('\n');
+        }
+
+        web::json::value query = web::json::value::parse(string2wstring(all));
+        ret = SQLResponseFromJSON(query);
+
+        if (ret->isException == true) {
+            string expMsg = wstring2string(ret->exceptionMessage);
+            throw exception(expMsg.c_str());
+        }
+
+        overwrite(ret.get());
+    }
+
+    return ret;
+}
+

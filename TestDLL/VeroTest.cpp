@@ -103,12 +103,23 @@ void veroMakeUriTest() {
 
 void veroJsonTest() {
 	// rest projects
-	cout << "veroJsonTest..." << "\n";
+    cout << "veroJsonTest..." << endl;
 
 	std::map<string, string> projectMap;
+    cout << "Test restListProjectsTest..." << endl;
 	restListProjectsTest(projectMap);
 
 	for (std::map<string, string>::iterator i = projectMap.begin(); i != projectMap.end(); i++) {
 		cout << "Project = " << (*i).first << endl;
 	}
+
+    cout << endl << "Test restGetMetaTest..." << endl;
+    std::unique_ptr<MetadataResponse> meta = restGetMetaTest();
+    int tableMetaSize = meta.get()->tableMetas.size();
+    int columnMetaSize = meta.get()->columnMetas.size();
+    cout << "tableMetaSize = " << tableMetaSize << ", columnMetaSize = " << columnMetaSize << endl;
+    
+    cout << endl << "Test restQueryTest..." << endl;
+    std::unique_ptr<SQLResponse> query = restQueryTest(L"select a from b");
+    cout << "affectedRow = " << query.get()->affectedRowCount << endl;
 }
