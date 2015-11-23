@@ -26,6 +26,10 @@ using namespace concurrency::streams;
 using namespace web;
 using namespace web::json;
 
+static boolean isTestMode() {
+    ifstream debug("C:\\kylin\\debug");
+    return debug.is_open();
+}
 
 void printLog(const char* msg) {
 	time_t     now = time(0);
@@ -173,27 +177,27 @@ http_request makeRequest(const char* username, const char* passwd, const wchar_t
 }
 
 bool restAuthenticate(char* serverAddr, long port, char* username, char* passwd) {
-#if !defined(JSON_TEST)
-	wstring  serverAddrW = completeServerStr(serverAddr, port);
-	http_client_config config;
-	config.set_timeout(utility::seconds(300));
-	http_client session(serverAddrW, config);
-	//can get project list only when correct username/password is given
-	http_request request = makeRequest(username, passwd, REST_URI_PROJECTS, methods::GET);
-	http_response response = session.request(request).get();
+    if (!isTestMode()) {
+        wstring  serverAddrW = completeServerStr(serverAddr, port);
+        http_client_config config;
+        config.set_timeout(utility::seconds(300));
+        http_client session(serverAddrW, config);
+        //can get project list only when correct username/password is given
+        http_request request = makeRequest(username, passwd, REST_URI_PROJECTS, methods::GET);
+        http_response response = session.request(request).get();
 
-	if (response.status_code() == status_codes::OK)
-	{
-		return true;
-	}
+        if (response.status_code() == status_codes::OK)
+        {
+            return true;
+        }
 
-	else
-	{
-		return false;
-	}
-#else
-    return restAuthenticateTest();
-#endif
+        else
+        {
+            return false;
+        }
+    } else {
+        return restAuthenticateTest();
+    }
 }
 
 bool restAuthenticateTest() { 
@@ -201,41 +205,41 @@ bool restAuthenticateTest() {
 }
 
 void restListProjects(char* serverAddr, long port, char* username, char* passwd, std::map<string, string>& projectMap) {
-#if !defined(JSON_TEST)
-	wstring  serverAddrW = completeServerStr(serverAddr, port);
-	http_client_config config;
-	config.set_timeout(utility::seconds(300));
-	http_client session(serverAddrW, config);
-	http_request request = makeRequest(username, passwd, REST_URI_PROJECTS, methods::GET);
-	http_response response = session.request(request).get();
+    if (!isTestMode()) {
+        wstring  serverAddrW = completeServerStr(serverAddr, port);
+        http_client_config config;
+        config.set_timeout(utility::seconds(300));
+        http_client session(serverAddrW, config);
+        http_request request = makeRequest(username, passwd, REST_URI_PROJECTS, methods::GET);
+        http_response response = session.request(request).get();
 
-	if (response.status_code() == status_codes::OK) {
-		web::json::value projects = response.extract_json().get();
+        if (response.status_code() == status_codes::OK) {
+            web::json::value projects = response.extract_json().get();
 
-		for (auto iter = projects.as_array().begin(); iter != projects.as_array().end(); ++iter) {
+            for (auto iter = projects.as_array().begin(); iter != projects.as_array().end(); ++iter) {
 #if defined(_KYLIN_REST_SERVICE)
-			projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("name")].as_string())));
+                projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("name")].as_string())));
 #else
-			projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("slug")].as_string())));
+                projectMap.insert(make_pair(wstring2string((*iter)[U("name")].as_string()), wstring2string((*iter)[U("slug")].as_string())));
 #endif
-		}
+            }
 
-		if (projectMap.size() == 0)
-		{
-			throw exception("There is no project available in this server");
-		}
-	}
-	else if (response.status_code() == status_codes::InternalError) {
-		std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(response.extract_json().get());
-		string errorMsg = wstring2string(em->msg);
-		throw  exception(errorMsg.c_str());
-	}
-	else {
-		throw exception("REST request(listproject) Invalid Response status code : " + response.status_code());
-	}
-#else
-    return restListProjectsTest(projectMap);
-#endif
+            if (projectMap.size() == 0)
+            {
+                throw exception("There is no project available in this server");
+            }
+        }
+        else if (response.status_code() == status_codes::InternalError) {
+            std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(response.extract_json().get());
+            string errorMsg = wstring2string(em->msg);
+            throw  exception(errorMsg.c_str());
+        }
+        else {
+            throw exception("REST request(listproject) Invalid Response status code : " + response.status_code());
+        }
+    } else {
+        return restListProjectsTest(projectMap);
+    }
 }
 
 void restListProjectsTest(std::map<string, string>& projectMap) {
@@ -273,29 +277,30 @@ std::unique_ptr<MetadataResponse> restGetMeta(
     char* username, 
     char* passwd, 
     char* project) {
-#if !defined(JSON_TEST)
-	wstring  serverAddrW = completeServerStr(serverAddr, port);
-	http_client_config config;
-	config.set_timeout(utility::seconds(300));
-	http_client session(serverAddrW, config);
-	std::wstringstream wss = makeMetaUri(project);
-	http_request request = makeRequest(username, passwd, wss.str().c_str(), methods::GET);
-	http_response response = session.request(request).get();
 
-	if (response.status_code() == status_codes::OK) {
-		return MetadataResponseFromJSON(response.extract_json().get());
-	} else if (response.status_code() == status_codes::Unauthorized) {
-		throw exception("Username/Password Unauthorized.");
-	} else if (response.status_code() == status_codes::InternalError) {
-		std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(response.extract_json().get());
-		string errorMsg = wstring2string(em->msg);
-		throw  exception(errorMsg.c_str());
-	} else {
-		throw exception("REST request(getmeta) Invalid Response status code : " + response.status_code());
-	}
-#else
-    return restGetMetaTest();
-#endif
+    if (!isTestMode()) {
+        wstring  serverAddrW = completeServerStr(serverAddr, port);
+        http_client_config config;
+        config.set_timeout(utility::seconds(300));
+        http_client session(serverAddrW, config);
+        std::wstringstream wss = makeMetaUri(project);
+        http_request request = makeRequest(username, passwd, wss.str().c_str(), methods::GET);
+        http_response response = session.request(request).get();
+
+        if (response.status_code() == status_codes::OK) {
+            return MetadataResponseFromJSON(response.extract_json().get());
+        } else if (response.status_code() == status_codes::Unauthorized) {
+            throw exception("Username/Password Unauthorized.");
+        } else if (response.status_code() == status_codes::InternalError) {
+            std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(response.extract_json().get());
+            string errorMsg = wstring2string(em->msg);
+            throw  exception(errorMsg.c_str());
+        } else {
+            throw exception("REST request(getmeta) Invalid Response status code : " + response.status_code());
+        }
+    } else {
+        return restGetMetaTest();
+    }
 }
 
 std::unique_ptr<MetadataResponse> restGetMetaTest() {
@@ -393,80 +398,80 @@ std::wstringstream makeQueryUri(char* project) {
 }
 
 std::unique_ptr<SQLResponse> restQuery(
-    wchar_t* rawSql, 
-    char* serverAddr, 
-    long port, 
+    wchar_t* rawSql,
+    char* serverAddr,
+    long port,
     char* username,
-	char* passwd,
-	char* project) {
-#if !defined(JSON_TEST)
-	//using local cache to intercept probing queries
-	std::unique_ptr<SQLResponse> cachedQueryRes = loadCache(rawSql);
+    char* passwd,
+    char* project) {
+    if (!isTestMode()) {
+        //using local cache to intercept probing queries
+        std::unique_ptr<SQLResponse> cachedQueryRes = loadCache(rawSql);
 
-	if (cachedQueryRes != NULL) {
-		return cachedQueryRes;
-	}
+        if (cachedQueryRes != NULL) {
+            return cachedQueryRes;
+        }
 
-	//real requesting
-	wstring serverAddrW = completeServerStr(serverAddr, port);
-	http_client_config config;
-	config.set_timeout(utility::seconds(36000));
-	http_client session(serverAddrW, config);
-	std::wstringstream wss1 = makeQueryUri(project);
-	http_request request = makeRequest(username, passwd, wss1.str().c_str(), methods::POST);
-	wstring sql = cookQuery(rawSql);
-	std::wstringstream wss2;
+        //real requesting
+        wstring serverAddrW = completeServerStr(serverAddr, port);
+        http_client_config config;
+        config.set_timeout(utility::seconds(36000));
+        http_client session(serverAddrW, config);
+        std::wstringstream wss1 = makeQueryUri(project);
+        http_request request = makeRequest(username, passwd, wss1.str().c_str(), methods::POST);
+        wstring sql = cookQuery(rawSql);
+        std::wstringstream wss2;
 #if defined(_KYLIN_REST_SERVICE)
-	wss2 << L"{ \"acceptPartial\": false, \"project\" : \"" << project << L"\", " << " \"sql\" : \"" << sql << L"\" }";
+        wss2 << L"{ \"acceptPartial\": false, \"project\" : \"" << project << L"\", " << " \"sql\" : \"" << sql << L"\" }";
 #else
-    wss2 << L"{ \"sql\" : \"" << sql << L"\" }";
+        wss2 << L"{ \"sql\" : \"" << sql << L"\" }";
 #endif
-	request.set_body(wss2.str(), L"application/json");
-	request.headers().add(header_names::accept_encoding, "gzip,deflate");
-	http::status_code status;
-	http_response response;
+        request.set_body(wss2.str(), L"application/json");
+        request.headers().add(header_names::accept_encoding, "gzip,deflate");
+        http::status_code status;
+        http_response response;
 
-	try {
-		response = session.request(request).get();
-		status = response.status_code();
-	}
+        try {
+            response = session.request(request).get();
+            status = response.status_code();
+        }
 
-	catch (std::exception& e) {
-		std::stringstream ss;
-		ss << "An exception is throw Error message: " << e.what();
-		throw exception(ss.str().c_str());
-	}
+        catch (std::exception& e) {
+            std::stringstream ss;
+            ss << "An exception is throw Error message: " << e.what();
+            throw exception(ss.str().c_str());
+        }
 
-	wstring ret = getBodyString(response);
+        wstring ret = getBodyString(response);
 
-	if (status == status_codes::OK) {
-		//convert to json
-		web::json::value actualRes = web::json::value::parse(ret);
-		std::unique_ptr<SQLResponse> r = SQLResponseFromJSON(actualRes);
+        if (status == status_codes::OK) {
+            //convert to json
+            web::json::value actualRes = web::json::value::parse(ret);
+            std::unique_ptr<SQLResponse> r = SQLResponseFromJSON(actualRes);
 
-		if (r->isException == true) {
-			string expMsg = wstring2string(r->exceptionMessage);
-			throw exception(expMsg.c_str());
-		}
+            if (r->isException == true) {
+                string expMsg = wstring2string(r->exceptionMessage);
+                throw exception(expMsg.c_str());
+            }
 
-		overwrite(r.get());
-		return r;
-	}
+            overwrite(r.get());
+            return r;
+        }
 
-	else if (status == status_codes::InternalError) {
-		std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(web::json::value::parse(ret));
-		string expMsg = wstring2string(em->msg);
-		throw  exception(expMsg.c_str());
-	}
+        else if (status == status_codes::InternalError) {
+            std::unique_ptr<ErrorMessage> em = ErrorMessageFromJSON(web::json::value::parse(ret));
+            string expMsg = wstring2string(em->msg);
+            throw  exception(expMsg.c_str());
+        }
 
-	else {
-		throw exception("Unknown exception in rest query with return code " + status);
-	}
+        else {
+            throw exception("Unknown exception in rest query with return code " + status);
+        }
 
-	return NULL;
-#else
-    return restQueryTest(rawSql);
-#endif
+        return NULL;
+    } else {
+        return restQueryTest(rawSql);
+    }
 }
 
 std::unique_ptr<SQLResponse> restQueryTest(wchar_t* rawSql) {
